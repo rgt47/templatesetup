@@ -7,7 +7,7 @@ categories: [setup, workflow, tooling, aws, bash]
 description: "I did not really appreciate how tedious it was to click through the EC2 console until I automated the whole process with four short bash scripts and the AWS CLI."
 image: "media/images/hero.png"
 document-type: "blog"
-draft: true
+draft: false
 execute:
   echo: true
   warning: false
