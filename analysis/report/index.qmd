@@ -1,7 +1,7 @@
 ---
 title: "Setup Post Template (worked example: AWS CLI provisioning)"
 subtitle: "A reproducible installation and configuration walkthrough"
-author: "Ronald G. Thomas"
+author: "Ronald 'Ryy' G. Thomas"
 date: "2025-01-01"
 categories: [setup, workflow, tooling, aws, bash]
 description: "I did not really appreciate how tedious it was to click through the EC2 console until I automated the whole process with four short bash scripts and the AWS CLI."
