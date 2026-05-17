@@ -103,6 +103,13 @@ analysis/configs/ and shown verbatim in the body.
 *Two machines, one source of truth: a reproducible dotfiles repository
 makes adding a second workstation a two-command operation.*
 
+::: {.callout-note}
+**Multi-Machine Setup Series** -- Recommended reading order:
+[Part 1: Migrating off Dropbox](/posts/64-migrating-off-dropbox/) |
+[Part 2: Multi-Laptop Bootstrap](/posts/65-multi-laptop-bootstrap/) |
+[Part 3: Security Audit](/posts/67-multi-laptop-security/)
+:::
+
 # Introduction
 
 Post 64, '[Migrating Off Dropbox: Beyond Dotfiles](https://focusonr.org/posts/64-migrating-off-dropbox/)',
