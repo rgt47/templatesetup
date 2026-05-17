@@ -132,15 +132,16 @@ from the current half-installed state.
 
 ## Motivations
 
-- The `tn` incident (a `sed -i.bak` against a Dropbox path truncated
-  a production script to zero bytes) demonstrated that cloud-mounted
-  paths are not safe working trees; git is the correct synchroniser.
+- The `tn` incident (a `sed -i.bak` against a cloud-mounted path
+  truncated a production script to zero bytes) demonstrated that
+  cloud sync is not a substitute for version control; git is the
+  correct synchroniser.
 - Setting up a second MacBook without a deployment mechanism means
   manually recreating months of accumulated configuration from
   memory, which is both error-prone and time-consuming.
-- Hardcoded `~/Library/CloudStorage/Dropbox/...` paths in scripts and
-  launchd plists break silently on any machine where Dropbox is
-  absent, uses a different account, or is installed at a legacy path.
+- Hardcoded absolute paths in scripts and launchd plists break
+  silently on any machine where the directory layout differs even
+  slightly from the primary machine.
 - Sensitive files (`~/.aws`, `~/.ssh`, `~/.gnupg`) live adjacent to
   tracked dotfiles with no formal inventory and no explicit decision
   about what belongs in git versus what must remain local.
@@ -203,7 +204,8 @@ This post assumes:
 
 If you are starting from scratch rather than migrating, post 24's
 step-by-step walkthrough is the right entry point. This post assumes
-the Dropbox-based status quo described above.
+you have already completed post 64's Dropbox migration and your shell
+configuration files now live in `~` as plain, unversioned dotfiles.
 
 # Audit Findings: Three Blockers
 
@@ -213,11 +215,10 @@ dotfiles can safely be exported to a second machine.
 
 ## Blocker 1: No Version Control
 
-`~/Library/CloudStorage/Dropbox/dotfiles/` has no `.git` directory.
-The entire shell configuration is a Dropbox-synced tree with no
-history, no diff capability, and no rollback. Dropbox version history
-is the only recovery path, and as the `tn` incident showed, that
-recovery is not guaranteed for in-place edits.
+The shell configuration living in `~` has no `.git` directory. There
+is no history, no diff capability, and no rollback. As the `tn`
+incident showed (covered in post 64), filesystem-level recovery is
+not guaranteed for in-place edits; git is the only reliable mechanism.
 
 The repository must live at `~/dotfiles`, outside any cloud-sync
 path. Git writes constantly to `.git/index`, `.git/HEAD`, and
@@ -227,22 +228,19 @@ truncate files to zero bytes. The `~/dotfiles` directory is
 local to each machine; git itself (with GitHub as the remote) is
 the synchroniser.
 
-## Blocker 2: Hardcoded Dropbox Paths
+## Blocker 2: Hardcoded Absolute Paths
 
 Every script in `~/bin/launchd/`, the launchd plists, the `cdpath`
-in `.zshrc`, and the `vz` alias all hardcode
-`~/Library/CloudStorage/Dropbox/...`. On a second laptop where
-Dropbox is absent, uses a different account, or is installed at the
-legacy path (`~/Dropbox`), every reference fails silently.
+in `.zshrc`, and the `vz` alias hardcode machine-specific absolute
+paths. On a second laptop with even a slightly different directory
+layout, every such reference fails silently.
 
 The fix is a single environment variable sourced from `~/.zshenv`:
 
 ```sh
 # ~/.zshenv
 export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-export PRJ_ROOT="${PRJ_ROOT:-$HOME/Dropbox/prj}"
-[[ -d "$PRJ_ROOT" ]] || \
-    export PRJ_ROOT="$HOME/Library/CloudStorage/Dropbox/prj"
+export PRJ_ROOT="${PRJ_ROOT:-$HOME/prj}"
 ```
 
 Every script and config then references `$DOTFILES` and `$PRJ_ROOT`
@@ -282,14 +280,14 @@ cd ~/dotfiles
 mkdir -p shell git editors system config bin launchd packages secrets
 
 # Shell configuration: drop leading dots
-cp ~/Library/CloudStorage/Dropbox/dotfiles/zshrc  shell/zshrc
-cp ~/.zshenv                                       shell/zshenv
-cp ~/.gitignore_global                             git/gitignore_global
-cp ~/.lintr                                        lintr
-cp ~/.mbsyncrc                                     mbsyncrc
+cp ~/.zshrc            shell/zshrc
+cp ~/.zshenv           shell/zshenv
+cp ~/.gitignore_global git/gitignore_global
+cp ~/.lintr            lintr
+cp ~/.mbsyncrc         mbsyncrc
 
-# bin scripts: copy real files, not the symlink farm
-cp -RL ~/Library/CloudStorage/Dropbox/bin/* bin/
+# bin scripts: copy real files (not symlinks)
+cp -RL ~/bin/* bin/
 rm -f bin/*.bak.*
 
 # XDG configs (selective; leave runtime state behind)
@@ -344,7 +342,7 @@ cd ~/dotfiles
 git init
 git add .
 git status   # review carefully before committing
-git commit -m 'initial import from Dropbox dotfiles'
+git commit -m 'initial dotfiles import'
 gh repo create rgt47/dotfiles --private --source=. --push
 ```
 
@@ -614,10 +612,10 @@ messages descriptive enough to understand what changed and why.
    commit.
 
 5. **`~/bin` must be a real directory populated by per-file symlinks,
-   not a symlink to a Dropbox directory.** A top-level `~/bin ->
-   ~/Library/CloudStorage/Dropbox/bin` symlink dangles on any
-   machine without Dropbox. The installer creates individual symlinks
-   from `~/dotfiles/bin/<script>` to `~/bin/<script>`.
+   not a symlink to any directory outside `$HOME`.** A top-level
+   symlink to an absolute path dangles silently on any machine with a
+   different directory layout. The installer creates individual
+   symlinks from `~/dotfiles/bin/<script>` to `~/bin/<script>`.
 
 6. **Test `install.sh --dry-run` on a non-primary user account before
    running it on a second laptop.** The first dry-run on a fresh
@@ -712,9 +710,10 @@ matching terminal sessions, muted earth tones. Placeholder.
   with user configuration in `~/.config`. The rule is: if a
   directory would be regenerated by running a tool, it is not
   user configuration and must not be tracked in git.
-- `~/bin` as a Dropbox symlink works on the primary machine but
-  produces a dangling symlink on any other machine. The per-file
-  symlink pattern is more verbose but correct across environments.
+- `~/bin` as a top-level symlink to an absolute path works on the
+  primary machine but produces a dangling symlink on any other
+  machine. The per-file symlink pattern is more verbose but correct
+  across environments.
 - The `rclone` configuration file (`~/.config/rclone/rclone.conf`)
   contains OAuth tokens and must be scrubbed of credentials before
   it is committed, even to a private repository.
@@ -768,7 +767,7 @@ easy to accumulate and expensive to close. Post 24 described the
 right design for a portable dotfiles repository in February 2026;
 this post documents the audit that revealed why it had not been
 executed, identifies the three blockers (no version control,
-hardcoded Dropbox paths, and sensitive files without an inventory),
+hardcoded absolute paths, and sensitive files without an inventory),
 and provides the concrete scripts and migration procedure.
 
 The highest-leverage change is also the simplest: `git init` in a
@@ -790,15 +789,28 @@ builds on that foundation.
   overwrite can be an afternoon.
 - Per-file symlinks in `~/bin` are more verbose than a top-level
   symlink but are the only pattern that works across machines with
-  different Dropbox configurations.
+  different directory layouts.
 
 # See Also
 
 **Related posts on this site:**
 
+- [Migrating Off Dropbox: Beyond Dotfiles](https://focusonr.org/posts/64-migrating-off-dropbox/)
+  (post 64): the preceding post in this series; covers migrating
+  project content, shell history, and large binaries off cloud sync
+  into a three-layer framework. This post implements the dotfiles
+  layer.
 - [Creating a GitHub Dotfiles Repository](https://focusonr.org/posts/24-setupdotfilesongithub/)
   (post 24, 2026-02-11): the architectural design this post
   implements.
+- [Setting Up pass, the Unix Password Manager](https://focusonr.org/posts/66-unix-pass-setup/)
+  (post 66): the next step after this post; covers GPG key
+  generation, pass initialisation, and migrating credentials out of
+  cloud sync.
+- [Multi-Laptop Security: Hardening the Bootstrap](https://focusonr.org/posts/67-multi-laptop-security/)
+  (post 67): a security audit of the infrastructure established in
+  posts 64-66; covers FileVault, GPG subkey architecture, per-machine
+  SSH keys, and quarterly review procedures.
 
 **Key resources:**
 
