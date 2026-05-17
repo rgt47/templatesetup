@@ -1,0 +1,1261 @@
+% Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  11pt,
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{241,243,245}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+
+\usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+
+
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\makeatletter
+\@ifpackageloaded{tcolorbox}{}{\usepackage[skins,breakable]{tcolorbox}}
+\makeatother
+\makeatletter
+\@ifundefined{shadecolor}{\definecolor{shadecolor}{rgb}{.97, .97, .97}}{}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, breakable, enhanced, frame hidden, interior hidden, sharp corners]}{\end{tcolorbox}}\fi
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Multi-Laptop macOS Bootstrap: Migrating Dotfiles to a Versioned Git Repository},
+  pdfauthor={Ronald `Ryy' G. Thomas},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{Multi-Laptop macOS Bootstrap: Migrating Dotfiles to a Versioned
+Git Repository}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{From a Dropbox-synced shell configuration to a portable,
+installable dotfiles repository with secrets handling and launchd
+support}
+\author{Ronald `Ryy' G. Thomas}
+\date{2026-05-17}
+\begin{document}
+\maketitle
+
+\renewcommand*\contentsname{Table of contents}
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+
+\begin{figure}[H]
+
+{\centering \includegraphics[width=0.8\linewidth,height=\textheight,keepaspectratio]{media/images/hero.jpg}
+
+}
+
+\caption{Two identical closed notebooks aligned on an oak desk, a brass
+ruler laid across both covers.}
+
+\end{figure}%
+
+\emph{Two machines. One source of truth.}
+
+\emph{A reproducible dotfiles repository makes adding a second
+workstation a two-command operation rather than a day-long archaeology
+project.}
+
+\section{Introduction}\label{introduction}
+
+I did not really appreciate how fragile my shell configuration was until
+I tried to replicate my macOS development environment on a second
+laptop. Every alias, every shell function, every launchd scheduled job,
+and every editor setting lived inside
+\texttt{\textasciitilde{}/Library/CloudStorage/Dropbox/dotfiles/}, a
+directory with no \texttt{.git} folder, no version history, no diff
+capability, and no rollback mechanism. The only `backup' was Dropbox's
+version history, which I discovered was inadequate when a
+\texttt{sed\ -i} command on a cloud-mounted path truncated a 546-line
+script to zero bytes.
+
+The design for a better arrangement already existed. Post 24,
+`\href{https://focusonr.org/posts/24-setupdotfilesongithub/}{Creating a
+GitHub Dotfiles Repository}', laid out the correct architecture: a
+standalone \texttt{\textasciitilde{}/dotfiles} git repository outside
+any cloud-sync path, an \texttt{install.sh} that creates symlinks with
+timestamped backups, platform detection via \texttt{\$OSTYPE}, a
+\texttt{Brewfile}, and an \texttt{.env.local} pattern for secrets. That
+post was written and published in February 2026 but never executed
+against the actual configuration.
+
+This post documents the audit that identified three concrete blockers
+preventing multi-laptop deployment, and the migration procedure that
+resolves them. It extends post 24's design with five additions: launchd
+plist parameterisation, a pipx tool manifest, a vim plugin-manager
+strategy, an explicit sensitive-files inventory, and migration steps
+from the current half-installed state.
+
+\subsection{Motivations}\label{motivations}
+
+\begin{itemize}
+\tightlist
+\item
+  The \texttt{tn} incident (a \texttt{sed\ -i.bak} against a Dropbox
+  path truncated a production script to zero bytes) demonstrated that
+  cloud-mounted paths are not safe working trees; git is the correct
+  synchroniser.
+\item
+  Setting up a second MacBook without a deployment mechanism means
+  manually recreating months of accumulated configuration from memory,
+  which is both error-prone and time-consuming.
+\item
+  Hardcoded \texttt{\textasciitilde{}/Library/CloudStorage/Dropbox/...}
+  paths in scripts and launchd plists break silently on any machine
+  where Dropbox is absent, uses a different account, or is installed at
+  a legacy path.
+\item
+  Sensitive files (\texttt{\textasciitilde{}/.aws},
+  \texttt{\textasciitilde{}/.ssh}, \texttt{\textasciitilde{}/.gnupg})
+  live adjacent to tracked dotfiles with no formal inventory and no
+  explicit decision about what belongs in git versus what must remain
+  local.
+\item
+  Understanding the gap between a written architecture and an executed
+  one is itself useful: post 24's design was sound but several category
+  errors (vim plugin bundles treated as config, runtime caches mixed
+  with user config) were only visible during an actual audit.
+\end{itemize}
+
+\subsection{Objectives}\label{objectives}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Identify every file that must be tracked, excluded, or handled via a
+  separate secrets mechanism, producing an explicit inventory.
+\item
+  Create \texttt{\textasciitilde{}/dotfiles} as a git repository outside
+  any cloud-sync path, structured per post 24's layout, and push it to a
+  private GitHub repository.
+\item
+  Write and test \texttt{install.sh} with \texttt{-\/-dry-run} support,
+  launchd \texttt{\_\_USER\_\_} substitution, and per-file symlinks for
+  \texttt{\textasciitilde{}/bin}.
+\item
+  Verify that a clean bootstrap (on a fresh user account or VM) runs
+  without hardcoded-path failures, undefined variable errors, or leaked
+  secrets.
+\end{enumerate}
+
+\begin{figure}[H]
+
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{media/images/ambiance1.jpg}}
+
+}
+
+\caption{Ambiance image 1: a single open laptop on a wooden desk,
+terminal visible, soft natural light. Placeholder.}
+
+\end{figure}%
+
+\section{What is a Dotfiles
+Repository?}\label{what-is-a-dotfiles-repository}
+
+A dotfiles repository is a version-controlled directory that stores
+shell configuration files, editor settings, and system scripts in a form
+that can be deployed to any new machine with a single command. Think of
+it as the source code for your development environment: just as
+application code can be cloned and built on a fresh server, a dotfiles
+repository can be cloned and installed on a fresh laptop.
+
+The concrete benefit is reproducibility. Without a dotfiles repository,
+two machines diverge the moment you customise one of them. With one, the
+command
+\texttt{git\ clone\ git@github.com:rgt47/dotfiles\ \textasciitilde{}/dotfiles\ \&\&\ cd\ \textasciitilde{}/dotfiles\ \&\&\ ./install.sh}
+brings a new laptop to the same state as the primary machine, minus
+secrets that must be installed by a separate mechanism.
+
+\section{Prerequisites}\label{prerequisites}
+
+This post assumes:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Operating system:} macOS 13+ (Ventura or later); the
+  architecture extends to Ubuntu 22.04+ with minor adjustments
+\item
+  \textbf{Hardware:} Apple Silicon or Intel Mac (the scripts are
+  architecture-agnostic)
+\item
+  \textbf{Already installed:} git, Homebrew, zsh 5.9+, pipx (for Python
+  CLI tools)
+\item
+  \textbf{Background knowledge:} comfort editing dotfiles, writing bash
+  scripts, and running shell commands; familiarity with post 24's design
+\item
+  \textbf{GitHub account:} with SSH access configured (the repository
+  must be private; never use a public repository for dotfiles)
+\item
+  \textbf{Time required:} 3-4 hours for the initial migration; 30
+  minutes to bootstrap subsequent laptops
+\end{itemize}
+
+If you are starting from scratch rather than migrating, post 24's
+step-by-step walkthrough is the right entry point. This post assumes the
+Dropbox-based status quo described above.
+
+\section{Audit Findings: Three
+Blockers}\label{audit-findings-three-blockers}
+
+Before writing any code, an audit of \texttt{\textasciitilde{}/bin},
+\texttt{\textasciitilde{}}, \texttt{\textasciitilde{}/.config}, and
+\texttt{\textasciitilde{}/.local} identified three issues that must be
+resolved before dotfiles can safely be exported to a second machine.
+
+\subsection{Blocker 1: No Version
+Control}\label{blocker-1-no-version-control}
+
+\texttt{\textasciitilde{}/Library/CloudStorage/Dropbox/dotfiles/} has no
+\texttt{.git} directory. The entire shell configuration is a
+Dropbox-synced tree with no history, no diff capability, and no
+rollback. Dropbox version history is the only recovery path, and as the
+\texttt{tn} incident showed, that recovery is not guaranteed for
+in-place edits.
+
+The repository must live at \texttt{\textasciitilde{}/dotfiles}, outside
+any cloud-sync path. Git writes constantly to \texttt{.git/index},
+\texttt{.git/HEAD}, and \texttt{.git/refs/...}; a cloud provider syncing
+those writes simultaneously causes race conditions that corrupt the
+index and can truncate files to zero bytes. The
+\texttt{\textasciitilde{}/dotfiles} directory is local to each machine;
+git itself (with GitHub as the remote) is the synchroniser.
+
+\subsection{Blocker 2: Hardcoded Dropbox
+Paths}\label{blocker-2-hardcoded-dropbox-paths}
+
+Every script in \texttt{\textasciitilde{}/bin/launchd/}, the launchd
+plists, the \texttt{cdpath} in \texttt{.zshrc}, and the \texttt{vz}
+alias all hardcode
+\texttt{\textasciitilde{}/Library/CloudStorage/Dropbox/...}. On a second
+laptop where Dropbox is absent, uses a different account, or is
+installed at the legacy path (\texttt{\textasciitilde{}/Dropbox}), every
+reference fails silently.
+
+The fix is a single environment variable sourced from
+\texttt{\textasciitilde{}/.zshenv}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# \textasciitilde{}/.zshenv}
+\BuiltInTok{export} \VariableTok{DOTFILES}\OperatorTok{=}\StringTok{"}\VariableTok{$\{DOTFILES}\OperatorTok{:{-}}\VariableTok{$HOME}\NormalTok{/dotfiles}\VariableTok{\}}\StringTok{"}
+\BuiltInTok{export} \VariableTok{PRJ\_ROOT}\OperatorTok{=}\StringTok{"}\VariableTok{$\{PRJ\_ROOT}\OperatorTok{:{-}}\VariableTok{$HOME}\NormalTok{/Dropbox/prj}\VariableTok{\}}\StringTok{"}
+\KeywordTok{[[} \OtherTok{{-}d} \StringTok{"}\VariableTok{$PRJ\_ROOT}\StringTok{"} \KeywordTok{]]} \KeywordTok{||} \DataTypeTok{\textbackslash{}}
+    \BuiltInTok{export} \VariableTok{PRJ\_ROOT}\OperatorTok{=}\StringTok{"}\VariableTok{$HOME}\StringTok{/Library/CloudStorage/Dropbox/prj"}
+\end{Highlighting}
+\end{Shaded}
+
+Every script and config then references \texttt{\$DOTFILES} and
+\texttt{\$PRJ\_ROOT} rather than literal paths.
+
+\subsection{Blocker 3: Sensitive Files Without an
+Inventory}\label{blocker-3-sensitive-files-without-an-inventory}
+
+Confirmed sensitive items in \texttt{\textasciitilde{}}:
+
+\begin{verbatim}
+~/.aws      AWS credentials (plaintext)
+~/.docker   registry tokens
+~/.env      project secrets
+~/.gnupg    private keys
+~/.npmrc    npm registry token
+~/.password-store  pass database (encrypted)
+~/.ssh      SSH private keys
+~/.vpn      VPN configuration
+\end{verbatim}
+
+These must never be committed to git, even in a private repository,
+because they appear in every cloned working tree and persist in history
+forever. A \texttt{.gitignore} written before the first
+\texttt{git\ add} is the only reliable control; after the first commit,
+sensitive data requires a full \texttt{git\ filter-repo} rewrite and
+credential rotation.
+
+\section{Installation: Creating
+\textasciitilde/dotfiles}\label{installation-creating-dotfiles}
+
+The migration proceeds in three phases: copy, restructure, and commit.
+
+\subsection{Phase 1: Copy Existing
+Content}\label{phase-1-copy-existing-content}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Create the new home outside cloud sync}
+\FunctionTok{mkdir} \AttributeTok{{-}p}\NormalTok{ \textasciitilde{}/dotfiles}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/dotfiles}
+\FunctionTok{mkdir} \AttributeTok{{-}p}\NormalTok{ shell git editors system config bin launchd packages secrets}
+
+\CommentTok{\# Shell configuration: drop leading dots}
+\FunctionTok{cp}\NormalTok{ \textasciitilde{}/Library/CloudStorage/Dropbox/dotfiles/zshrc  shell/zshrc}
+\FunctionTok{cp}\NormalTok{ \textasciitilde{}/.zshenv                                       shell/zshenv}
+\FunctionTok{cp}\NormalTok{ \textasciitilde{}/.gitignore\_global                             git/gitignore\_global}
+\FunctionTok{cp}\NormalTok{ \textasciitilde{}/.lintr                                        lintr}
+\FunctionTok{cp}\NormalTok{ \textasciitilde{}/.mbsyncrc                                     mbsyncrc}
+
+\CommentTok{\# bin scripts: copy real files, not the symlink farm}
+\FunctionTok{cp} \AttributeTok{{-}RL}\NormalTok{ \textasciitilde{}/Library/CloudStorage/Dropbox/bin/}\PreprocessorTok{*}\NormalTok{ bin/}
+\FunctionTok{rm} \AttributeTok{{-}f}\NormalTok{ bin/}\PreprocessorTok{*}\NormalTok{.bak.}\PreprocessorTok{*}
+
+\CommentTok{\# XDG configs (selective; leave runtime state behind)}
+\ControlFlowTok{for}\NormalTok{ d }\KeywordTok{in}\NormalTok{ ghostty kitty karabiner gh rclone mutt nvim}\KeywordTok{;} \ControlFlowTok{do}
+    \BuiltInTok{[} \OtherTok{{-}d}\NormalTok{ \textasciitilde{}/.config/}\VariableTok{$d} \BuiltInTok{]} \KeywordTok{\&\&} \FunctionTok{cp} \AttributeTok{{-}R}\NormalTok{ \textasciitilde{}/.config/}\VariableTok{$d}\NormalTok{ config/}\VariableTok{$d}
+\ControlFlowTok{done}
+\end{Highlighting}
+\end{Shaded}
+
+Do not copy \texttt{\textasciitilde{}/.config/vim/} (22M of downloaded
+plugin bundles), \texttt{\textasciitilde{}/.config/coc/} (1.6M of
+language-server cache), or any directory under
+\texttt{\textasciitilde{}/.config/} that contains runtime state rather
+than user configuration. These will be regenerated on each laptop by the
+plugin manager.
+
+\subsection{Phase 2: Write .gitignore Before git
+init}\label{phase-2-write-.gitignore-before-git-init}
+
+This step is not optional. Write the \texttt{.gitignore} file before the
+first \texttt{git\ add}. One commit with a credential in history
+requires a full rewrite.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# Sensitive directories: NEVER commit}
+\NormalTok{secrets/*}
+\NormalTok{!secrets/README.md}
+\NormalTok{**/.env}
+\NormalTok{**/.env.local}
+\NormalTok{**/.env.*.local}
+\NormalTok{**/credentials*}
+\NormalTok{**/*.pem}
+\NormalTok{**/*.key}
+\NormalTok{**/id\_rsa*}
+\NormalTok{**/id\_ed25519*}
+
+\NormalTok{\# Per{-}machine state}
+\NormalTok{*.backup.*}
+\NormalTok{.DS\_Store}
+\NormalTok{.zsh\_history}
+\NormalTok{.viminfo}
+\NormalTok{.zcompdump*}
+
+\NormalTok{\# Plugin manager output (regenerated at install time)}
+\NormalTok{config/vim/bundle/}
+\NormalTok{config/vim/plugged/}
+\NormalTok{config/nvim/plugged/}
+\NormalTok{config/nvim/coc/}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Phase 3: Commit and Push}\label{phase-3-commit-and-push}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/dotfiles}
+\FunctionTok{git}\NormalTok{ init}
+\FunctionTok{git}\NormalTok{ add .}
+\FunctionTok{git}\NormalTok{ status   }\CommentTok{\# review carefully before committing}
+\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{\textquotesingle{}initial import from Dropbox dotfiles\textquotesingle{}}
+\ExtensionTok{gh}\NormalTok{ repo create rgt47/dotfiles }\AttributeTok{{-}{-}private} \AttributeTok{{-}{-}source}\OperatorTok{=}\NormalTok{. }\AttributeTok{{-}{-}push}
+\end{Highlighting}
+\end{Shaded}
+
+Review \texttt{git\ status} output before committing. If any file in the
+listing looks sensitive, add it to \texttt{.gitignore} and re-check
+before proceeding.
+
+\section{Configuration}\label{configuration}
+
+\subsection{install.sh}\label{install.sh}
+
+The installer creates symlinks from \texttt{\textasciitilde{}/dotfiles}
+into \texttt{\$HOME}, handles launchd plist parameterisation, and
+installs packages via Homebrew and pipx. A \texttt{-\/-dry-run} flag
+prints every action without executing it.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#!/bin/bash}
+\CommentTok{\# install.sh: deploy dotfiles into $HOME via symlinks.}
+\CommentTok{\# Idempotent: existing files are backed up with a timestamp}
+\CommentTok{\# suffix before being replaced.}
+\BuiltInTok{set} \AttributeTok{{-}euo}\NormalTok{ pipefail}
+
+\VariableTok{DRY\_RUN}\OperatorTok{=}\NormalTok{0}
+\KeywordTok{[[} \StringTok{"}\VariableTok{$\{1}\OperatorTok{:{-}}\VariableTok{\}}\StringTok{"} \OtherTok{==} \StringTok{"{-}{-}dry{-}run"} \KeywordTok{]]} \KeywordTok{\&\&} \VariableTok{DRY\_RUN}\OperatorTok{=}\NormalTok{1}
+
+\VariableTok{DOTFILES}\OperatorTok{=}\StringTok{"}\VariableTok{$(}\BuiltInTok{cd} \StringTok{"}\VariableTok{$(}\FunctionTok{dirname} \StringTok{"}\VariableTok{$0}\StringTok{"}\VariableTok{)}\StringTok{"} \KeywordTok{\&\&} \BuiltInTok{pwd}\VariableTok{)}\StringTok{"}
+
+\FunctionTok{log()}      \KeywordTok{\{} \BuiltInTok{echo} \StringTok{"[INFO]  }\VariableTok{$*}\StringTok{"}\KeywordTok{;} \KeywordTok{\}}
+\FunctionTok{warn()}     \KeywordTok{\{} \BuiltInTok{echo} \StringTok{"[WARN]  }\VariableTok{$*}\StringTok{"} \OperatorTok{\textgreater{}\&}\DecValTok{2}\KeywordTok{;} \KeywordTok{\}}
+\FunctionTok{do\_or\_say()} \KeywordTok{\{}
+  \KeywordTok{[[} \VariableTok{$DRY\_RUN} \OtherTok{{-}eq}\NormalTok{ 1 }\KeywordTok{]]} \KeywordTok{\&\&} \BuiltInTok{echo} \StringTok{"[DRY] }\VariableTok{$*}\StringTok{"} \KeywordTok{||} \StringTok{"}\VariableTok{$@}\StringTok{"}
+\KeywordTok{\}}
+
+\FunctionTok{link\_file()} \KeywordTok{\{}
+  \BuiltInTok{local} \VariableTok{src}\OperatorTok{=}\StringTok{"}\VariableTok{$1}\StringTok{"} \VariableTok{dest}\OperatorTok{=}\StringTok{"}\VariableTok{$2}\StringTok{"}
+  \ControlFlowTok{if} \BuiltInTok{[} \OtherTok{{-}e} \StringTok{"}\VariableTok{$dest}\StringTok{"} \BuiltInTok{]} \KeywordTok{\&\&} \BuiltInTok{[} \OtherTok{!} \OtherTok{{-}L} \StringTok{"}\VariableTok{$dest}\StringTok{"} \BuiltInTok{]}\KeywordTok{;} \ControlFlowTok{then}
+    \ExtensionTok{warn} \StringTok{"}\VariableTok{$dest}\StringTok{ exists, creating backup"}
+    \ExtensionTok{do\_or\_say}\NormalTok{ mv }\StringTok{"}\VariableTok{$dest}\StringTok{"} \DataTypeTok{\textbackslash{}}
+      \StringTok{"}\VariableTok{$\{dest\}}\StringTok{.backup.}\VariableTok{$(}\FunctionTok{date}\NormalTok{ +\%Y\%m\%d\_\%H\%M\%S}\VariableTok{)}\StringTok{"}
+  \ControlFlowTok{fi}
+  \ExtensionTok{do\_or\_say}\NormalTok{ mkdir }\AttributeTok{{-}p} \StringTok{"}\VariableTok{$(}\FunctionTok{dirname} \StringTok{"}\VariableTok{$dest}\StringTok{"}\VariableTok{)}\StringTok{"}
+  \ExtensionTok{do\_or\_say}\NormalTok{ ln }\AttributeTok{{-}sfn} \StringTok{"}\VariableTok{$src}\StringTok{"} \StringTok{"}\VariableTok{$dest}\StringTok{"}
+  \ExtensionTok{log} \StringTok{"Linked }\VariableTok{$src}\StringTok{ {-}\textgreater{} }\VariableTok{$dest}\StringTok{"}
+\KeywordTok{\}}
+
+\CommentTok{\# Shell, git, editors {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\ExtensionTok{link\_file} \StringTok{"}\VariableTok{$DOTFILES}\StringTok{/shell/zshrc"}  \StringTok{"}\VariableTok{$HOME}\StringTok{/.zshrc"}
+\ExtensionTok{link\_file} \StringTok{"}\VariableTok{$DOTFILES}\StringTok{/shell/zshenv"} \StringTok{"}\VariableTok{$HOME}\StringTok{/.zshenv"}
+\ExtensionTok{link\_file} \StringTok{"}\VariableTok{$DOTFILES}\StringTok{/git/gitconfig"}         \StringTok{"}\VariableTok{$HOME}\StringTok{/.gitconfig"}
+\ExtensionTok{link\_file} \StringTok{"}\VariableTok{$DOTFILES}\StringTok{/git/gitignore\_global"}  \StringTok{"}\VariableTok{$HOME}\StringTok{/.gitignore\_global"}
+\ExtensionTok{link\_file} \StringTok{"}\VariableTok{$DOTFILES}\StringTok{/editors/vimrc"} \DataTypeTok{\textbackslash{}}
+  \StringTok{"}\VariableTok{$HOME}\StringTok{/.config/vim/vimrc"}
+
+\CommentTok{\# XDG configs {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\ControlFlowTok{for}\NormalTok{ d }\KeywordTok{in} \StringTok{"}\VariableTok{$DOTFILES}\StringTok{"}\NormalTok{/config/}\PreprocessorTok{*}\NormalTok{/}\KeywordTok{;} \ControlFlowTok{do}
+  \VariableTok{name}\OperatorTok{=}\StringTok{"}\VariableTok{$(}\FunctionTok{basename} \StringTok{"}\VariableTok{$d}\StringTok{"}\VariableTok{)}\StringTok{"}
+  \ExtensionTok{link\_file} \StringTok{"}\VariableTok{$d}\StringTok{"} \StringTok{"}\VariableTok{$HOME}\StringTok{/.config/}\VariableTok{$name}\StringTok{"}
+\ControlFlowTok{done}
+
+\CommentTok{\# \textasciitilde{}/bin scripts: per{-}file symlinks (not a top{-}level link) {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\ExtensionTok{do\_or\_say}\NormalTok{ mkdir }\AttributeTok{{-}p} \StringTok{"}\VariableTok{$HOME}\StringTok{/bin"}
+\ControlFlowTok{for}\NormalTok{ f }\KeywordTok{in} \StringTok{"}\VariableTok{$DOTFILES}\StringTok{"}\NormalTok{/bin/}\PreprocessorTok{*}\KeywordTok{;} \ControlFlowTok{do}
+  \ExtensionTok{link\_file} \StringTok{"}\VariableTok{$f}\StringTok{"} \StringTok{"}\VariableTok{$HOME}\StringTok{/bin/}\VariableTok{$(}\FunctionTok{basename} \StringTok{"}\VariableTok{$f}\StringTok{"}\VariableTok{)}\StringTok{"}
+\ControlFlowTok{done}
+
+\CommentTok{\# launchd plists: substitute \_\_USER\_\_ then install {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\ExtensionTok{do\_or\_say}\NormalTok{ mkdir }\AttributeTok{{-}p} \StringTok{"}\VariableTok{$HOME}\StringTok{/Library/LaunchAgents"}
+\ControlFlowTok{for}\NormalTok{ plist }\KeywordTok{in} \StringTok{"}\VariableTok{$DOTFILES}\StringTok{"}\NormalTok{/launchd/}\PreprocessorTok{*}\NormalTok{.plist}\KeywordTok{;} \ControlFlowTok{do}
+  \VariableTok{name}\OperatorTok{=}\StringTok{"}\VariableTok{$(}\FunctionTok{basename} \StringTok{"}\VariableTok{$plist}\StringTok{"}\VariableTok{)}\StringTok{"}
+  \VariableTok{target}\OperatorTok{=}\StringTok{"}\VariableTok{$HOME}\StringTok{/Library/LaunchAgents/}\VariableTok{$name}\StringTok{"}
+  \ExtensionTok{do\_or\_say}\NormalTok{ sed }\StringTok{"s|\_\_USER\_\_|}\VariableTok{$USER}\StringTok{|g"} \StringTok{"}\VariableTok{$plist}\StringTok{"} \OperatorTok{\textgreater{}} \StringTok{"}\VariableTok{$target}\StringTok{"}
+  \ExtensionTok{log} \StringTok{"Installed }\VariableTok{$target}\StringTok{ (with \_\_USER\_\_ {-}\textgreater{} }\VariableTok{$USER}\StringTok{)"}
+\ControlFlowTok{done}
+
+\CommentTok{\# Package managers {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\ControlFlowTok{if} \BuiltInTok{command} \AttributeTok{{-}v}\NormalTok{ brew }\OperatorTok{\textgreater{}}\NormalTok{/dev/null }\DecValTok{2}\OperatorTok{\textgreater{}\&}\DecValTok{1}\KeywordTok{;} \ControlFlowTok{then}
+  \ExtensionTok{do\_or\_say}\NormalTok{ brew bundle }\DataTypeTok{\textbackslash{}}
+    \AttributeTok{{-}{-}file}\OperatorTok{=}\StringTok{"}\VariableTok{$DOTFILES}\StringTok{/packages/Brewfile"}
+\ControlFlowTok{fi}
+\ControlFlowTok{if} \BuiltInTok{command} \AttributeTok{{-}v}\NormalTok{ pipx }\OperatorTok{\textgreater{}}\NormalTok{/dev/null }\DecValTok{2}\OperatorTok{\textgreater{}\&}\DecValTok{1} \KeywordTok{\&\&} \DataTypeTok{\textbackslash{}}
+   \BuiltInTok{[} \OtherTok{{-}f} \StringTok{"}\VariableTok{$DOTFILES}\StringTok{/packages/pipx{-}tools.txt"} \BuiltInTok{]}\KeywordTok{;} \ControlFlowTok{then}
+  \ControlFlowTok{while} \BuiltInTok{read} \AttributeTok{{-}r} \VariableTok{tool}\KeywordTok{;} \ControlFlowTok{do}
+    \KeywordTok{[[} \OtherTok{{-}z} \StringTok{"}\VariableTok{$tool}\StringTok{"} \KeywordTok{||} \StringTok{"}\VariableTok{$tool}\StringTok{"} \OtherTok{=\textasciitilde{}} \PreprocessorTok{\^{}}\SpecialStringTok{\#} \KeywordTok{]]} \KeywordTok{\&\&} \ControlFlowTok{continue}
+    \ExtensionTok{do\_or\_say}\NormalTok{ pipx install }\AttributeTok{{-}{-}force} \StringTok{"}\VariableTok{$tool}\StringTok{"}
+  \ControlFlowTok{done} \OperatorTok{\textless{}} \StringTok{"}\VariableTok{$DOTFILES}\StringTok{/packages/pipx{-}tools.txt"}
+\ControlFlowTok{fi}
+
+\ExtensionTok{log} \StringTok{"Install complete. Manual follow{-}ups:"}
+\ExtensionTok{log} \StringTok{"  {-} Copy shell/env.local.example to \textasciitilde{}/.env.local"}
+\ExtensionTok{log} \StringTok{"  {-} Restore \textasciitilde{}/.aws, \textasciitilde{}/.ssh, \textasciitilde{}/.gnupg from secure storage"}
+\ExtensionTok{log} \StringTok{"  {-} Reload launchd: launchctl bootstrap gui/}\DataTypeTok{\textbackslash{}$}\StringTok{UID }\DataTypeTok{\textbackslash{}}
+\StringTok{\textasciitilde{}/Library/LaunchAgents/*.plist"}
+\ExtensionTok{log} \StringTok{"  {-} Restart shell: source \textasciitilde{}/.zshrc"}
+\end{Highlighting}
+\end{Shaded}
+
+The full source is at \texttt{analysis/configs/install.sh}.
+
+Three deviations from post 24's original \texttt{install.sh} deserve
+explanation:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{\texttt{-\/-dry-run} flag:} prints every operation without
+  executing, allowing review before the first real run on a new machine.
+\item
+  \textbf{XDG-config and \texttt{\textasciitilde{}/bin} loops:} a new
+  helper script or config directory is picked up automatically without
+  editing \texttt{install.sh}.
+\item
+  \textbf{launchd \texttt{\_\_USER\_\_} substitution:} macOS
+  \texttt{launchd} does not expand \texttt{\textasciitilde{}} in plist
+  files, so absolute paths are required; the installer writes the
+  substituted plist to \texttt{\textasciitilde{}/Library/LaunchAgents/}
+  rather than tracking the substituted form in git.
+\end{enumerate}
+
+\subsection{Makefile}\label{makefile}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{.PHONY: install update lint backup test help}
+
+\NormalTok{help:}
+\NormalTok{    @echo "Targets:"}
+\NormalTok{    @echo "  install   create symlinks; install brew/pipx packages"}
+\NormalTok{    @echo "  update    git pull, then re{-}run install.sh"}
+\NormalTok{    @echo "  lint      shellcheck bash; zsh {-}n zsh scripts"}
+\NormalTok{    @echo "  backup    snapshot current dotfiles"}
+\NormalTok{    @echo "  test      install.sh {-}{-}dry{-}run plus lint"}
+
+\NormalTok{install:}
+\NormalTok{    ./install.sh}
+
+\NormalTok{update:}
+\NormalTok{    git pull origin main}
+\NormalTok{    ./install.sh}
+
+\NormalTok{lint:}
+\NormalTok{    find bin {-}type f {-}name \textquotesingle{}*.sh\textquotesingle{} {-}exec shellcheck \{\} \textbackslash{};}
+\NormalTok{    find shell {-}type f {-}exec zsh {-}n \{\} \textbackslash{};}
+
+\NormalTok{backup:}
+\NormalTok{    @d=backups/$$(date +\%Y\%m\%d{-}\%H\%M\%S) \&\& mkdir {-}p "$$d" \&\& \textbackslash{}}
+\NormalTok{    for f in .zshrc .zshenv .gitconfig .vimrc; do \textbackslash{}}
+\NormalTok{      [ {-}e "$$HOME/$$f" ] \&\& cp "$$HOME/$$f" "$$d/"; \textbackslash{}}
+\NormalTok{    done}
+
+\NormalTok{test:}
+\NormalTok{    ./install.sh {-}{-}dry{-}run}
+\NormalTok{    $(MAKE) lint}
+\end{Highlighting}
+\end{Shaded}
+
+The full source is at \texttt{analysis/configs/Makefile}.
+
+\subsection{Capturing Package
+Manifests}\label{capturing-package-manifests}
+
+Before the first push, capture the current toolchain so that a new
+laptop gets the same packages:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{brew}\NormalTok{ bundle dump }\DataTypeTok{\textbackslash{}}
+  \AttributeTok{{-}{-}file}\OperatorTok{=}\NormalTok{\textasciitilde{}/dotfiles/packages/Brewfile }\AttributeTok{{-}{-}force}
+
+\CommentTok{\# pipx tools}
+\ExtensionTok{pipx}\NormalTok{ list }\AttributeTok{{-}{-}short} \DataTypeTok{\textbackslash{}}
+  \KeywordTok{|} \FunctionTok{awk} \StringTok{\textquotesingle{}\{print $1\}\textquotesingle{}} \OperatorTok{\textgreater{}}\NormalTok{ \textasciitilde{}/dotfiles/packages/pipx{-}tools.txt}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}[H]
+
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{media/images/ambiance2.jpg}}
+
+}
+
+\caption{Ambiance image 2: a terminal showing git log output and file
+structure, warm overhead lighting, shallow depth of field. Placeholder.}
+
+\end{figure}%
+
+\section{The Migration Procedure}\label{the-migration-procedure}
+
+With \texttt{\textasciitilde{}/dotfiles} populated and committed, deploy
+to \texttt{\$HOME}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/dotfiles}
+\ExtensionTok{./install.sh} \AttributeTok{{-}{-}dry{-}run}   \CommentTok{\# review all planned actions}
+\ExtensionTok{./install.sh}             \CommentTok{\# execute}
+\end{Highlighting}
+\end{Shaded}
+
+After the installer runs:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Reload launchd agents:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{launchctl}\NormalTok{ bootstrap gui/}\VariableTok{$UID} \DataTypeTok{\textbackslash{}}
+\NormalTok{  \textasciitilde{}/Library/LaunchAgents/}\PreprocessorTok{*}\NormalTok{.plist}
+\end{Highlighting}
+\end{Shaded}
+\item
+  Restart the shell: \texttt{source\ \textasciitilde{}/.zshrc}
+\item
+  Verify a sample alias or function resolves correctly.
+\end{enumerate}
+
+To bootstrap a second laptop:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ clone git@github.com:rgt47/dotfiles \textasciitilde{}/dotfiles}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/dotfiles }\KeywordTok{\&\&} \ExtensionTok{./install.sh}
+\end{Highlighting}
+\end{Shaded}
+
+Then manually restore \texttt{\textasciitilde{}/.aws},
+\texttt{\textasciitilde{}/.ssh}, and \texttt{\textasciitilde{}/.gnupg}
+from secure storage (1Password, \texttt{pass}, or hand-transfer). These
+are never in git; the installer prints a reminder.
+
+\section{Verification}\label{verification}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 1. Confirm symlinks are in place}
+\FunctionTok{ls} \AttributeTok{{-}la}\NormalTok{ \textasciitilde{}/.zshrc \textasciitilde{}/.gitconfig \textasciitilde{}/.config/ghostty}
+
+\CommentTok{\# 2. Check that DOTFILES and PRJ\_ROOT resolve correctly}
+\BuiltInTok{echo} \StringTok{"}\VariableTok{$DOTFILES}\StringTok{"}
+\BuiltInTok{echo} \StringTok{"}\VariableTok{$PRJ\_ROOT}\StringTok{"}
+
+\CommentTok{\# 3. Verify launchd jobs loaded without error}
+\ExtensionTok{launchctl}\NormalTok{ list }\KeywordTok{|} \FunctionTok{grep}\NormalTok{ local.}
+
+\CommentTok{\# 4. Confirm pipx tools are installed}
+\ExtensionTok{pipx}\NormalTok{ list }\AttributeTok{{-}{-}short}
+
+\CommentTok{\# 5. Dry{-}run passes cleanly on the current machine}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/dotfiles }\KeywordTok{\&\&} \FunctionTok{make}\NormalTok{ test}
+\end{Highlighting}
+\end{Shaded}
+
+Step 5 (\texttt{make\ test}) runs \texttt{install.sh\ -\/-dry-run} and
+\texttt{make\ lint}, which exercises \texttt{shellcheck} against every
+script in \texttt{bin/}. A clean run with no warnings confirms the
+repository is in a deployable state.
+
+\section{Daily Workflow}\label{daily-workflow}
+
+After setup, the dotfiles repository becomes a standard git project.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.4605}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5395}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Command
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Action
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{cd\ \textasciitilde{}/dotfiles\ \&\&\ git\ diff} & Review
+uncommitted config changes \\
+\texttt{make\ test} & Lint + dry-run before committing \\
+\texttt{make\ install} & Re-link after adding a new config file \\
+\texttt{make\ update} & Pull from GitHub and re-run install \\
+\texttt{make\ backup} & Snapshot current \texttt{\textasciitilde{}}
+dotfiles \\
+\texttt{brew\ bundle\ dump\ -\/-force} & Refresh Brewfile after new
+installs \\
+\texttt{pipx\ list\ -\/-short\ \textgreater{}\ pipx-tools.txt} & Update
+pipx manifest \\
+\end{longtable}
+}
+
+The repository should be treated like any other codebase: commit small,
+test before pushing, and keep the \texttt{CHANGELOG} or commit messages
+descriptive enough to understand what changed and why.
+
+\section{Things to Watch Out For}\label{things-to-watch-out-for}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Write \texttt{.gitignore} before \texttt{git\ init}, not
+  after.} If any sensitive file is committed even once, it must be
+  removed with \texttt{git\ filter-repo} and every credential it
+  contained must be rotated. There is no lighter-weight remediation.
+\item
+  \textbf{Do not place the dotfiles repo inside Dropbox, iCloud, or
+  Google Drive.} Git writes to \texttt{.git/index}, \texttt{.git/HEAD},
+  and ref files continuously; a cloud provider racing to sync those
+  writes can corrupt the index or truncate files to zero bytes. This is
+  the same failure mode as the \texttt{tn} incident (2026-05-03).
+\item
+  \textbf{The launchd \texttt{\_\_USER\_\_} substitution writes to
+  \texttt{\textasciitilde{}/Library/LaunchAgents/}, not back to the
+  repo.} If you edit a plist in
+  \texttt{\textasciitilde{}/dotfiles/launchd/} and re-run
+  \texttt{install.sh}, the substituted file is overwritten in place.
+  Never \texttt{git\ add} the file from
+  \texttt{\textasciitilde{}/Library/LaunchAgents/}; always edit the
+  template in \texttt{\textasciitilde{}/dotfiles/launchd/}.
+\item
+  \textbf{vim plugin bundle directories must not be tracked.} The 22M
+  \texttt{\textasciitilde{}/.config/vim/} directory is almost entirely
+  downloaded plugin code managed by vim-plug or Vundle. Track only the
+  \texttt{vimrc} and the plugin manifest; the installer should run the
+  plugin manager on first boot. The same applies to
+  \texttt{\textasciitilde{}/.config/coc/} (1.6M of language-server
+  cache). Add both to \texttt{.gitignore} before the first commit.
+\item
+  \textbf{\texttt{\textasciitilde{}/bin} must be a real directory
+  populated by per-file symlinks, not a symlink to a Dropbox directory.}
+  A top-level
+  \texttt{\textasciitilde{}/bin\ -\textgreater{}\ \textasciitilde{}/Library/CloudStorage/Dropbox/bin}
+  symlink dangles on any machine without Dropbox. The installer creates
+  individual symlinks from
+  \texttt{\textasciitilde{}/dotfiles/bin/\textless{}script\textgreater{}}
+  to \texttt{\textasciitilde{}/bin/\textless{}script\textgreater{}}.
+\item
+  \textbf{Test \texttt{install.sh\ -\/-dry-run} on a non-primary user
+  account before running it on a second laptop.} The first dry-run on a
+  fresh environment will surface hardcoded paths and assumptions
+  invisible on the primary machine. Identify and fix them before the
+  real bootstrap.
+\end{enumerate}
+
+\section{Uninstall / Rollback}\label{uninstall-rollback}
+
+To remove the dotfiles installation and restore the previous state:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 1. Reverse the symlinks (restores any .backup.TIMESTAMP files)}
+\ControlFlowTok{for}\NormalTok{ f }\KeywordTok{in}\NormalTok{ \textasciitilde{}/.zshrc \textasciitilde{}/.zshenv \textasciitilde{}/.gitconfig \textasciitilde{}/.gitignore\_global}\KeywordTok{;} \ControlFlowTok{do}
+  \VariableTok{backup}\OperatorTok{=}\VariableTok{$(}\FunctionTok{ls} \StringTok{"}\VariableTok{$\{f\}}\StringTok{.backup."}\PreprocessorTok{*} \DecValTok{2}\OperatorTok{\textgreater{}}\NormalTok{/dev/null }\KeywordTok{|} \FunctionTok{tail} \AttributeTok{{-}1}\VariableTok{)}
+  \ControlFlowTok{if} \BuiltInTok{[} \OtherTok{{-}L} \StringTok{"}\VariableTok{$f}\StringTok{"} \BuiltInTok{]} \KeywordTok{\&\&} \BuiltInTok{[} \OtherTok{{-}n} \StringTok{"}\VariableTok{$backup}\StringTok{"} \BuiltInTok{]}\KeywordTok{;} \ControlFlowTok{then}
+    \FunctionTok{rm} \StringTok{"}\VariableTok{$f}\StringTok{"} \KeywordTok{\&\&} \FunctionTok{mv} \StringTok{"}\VariableTok{$backup}\StringTok{"} \StringTok{"}\VariableTok{$f}\StringTok{"}
+  \ControlFlowTok{fi}
+\ControlFlowTok{done}
+
+\CommentTok{\# 2. Remove \textasciitilde{}/bin per{-}file symlinks (leaves non{-}symlinked files)}
+\FunctionTok{find}\NormalTok{ \textasciitilde{}/bin }\AttributeTok{{-}maxdepth}\NormalTok{ 1 }\AttributeTok{{-}type}\NormalTok{ l }\AttributeTok{{-}delete}
+
+\CommentTok{\# 3. Unload launchd agents}
+\ExtensionTok{launchctl}\NormalTok{ bootout gui/}\VariableTok{$UID} \DataTypeTok{\textbackslash{}}
+\NormalTok{  \textasciitilde{}/Library/LaunchAgents/local.}\PreprocessorTok{*}\NormalTok{.plist}
+
+\CommentTok{\# 4. Remove the installed plists}
+\FunctionTok{rm}\NormalTok{ \textasciitilde{}/Library/LaunchAgents/local.}\PreprocessorTok{*}\NormalTok{.plist}
+
+\CommentTok{\# 5. Remove the \textasciitilde{}/dotfiles repo (optional)}
+\FunctionTok{rm} \AttributeTok{{-}rf}\NormalTok{ \textasciitilde{}/dotfiles}
+\end{Highlighting}
+\end{Shaded}
+
+If the \texttt{.backup.TIMESTAMP} files were not created (first-run on a
+machine with no prior dotfiles), step 1 produces empty symlinks that
+must be removed manually. The \texttt{-\/-dry-run} flag on
+\texttt{install.sh} shows exactly which files would be backed up before
+the real run.
+
+\begin{figure}[H]
+
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{media/images/ambiance3.jpg}}
+
+}
+
+\caption{Ambiance image 3: two laptops open side by side on a shared
+desk, matching terminal sessions, muted earth tones. Placeholder.}
+
+\end{figure}%
+
+\section{What Did We Learn?}\label{what-did-we-learn}
+
+\subsection{Lessons Learnt}\label{lessons-learnt}
+
+\textbf{Conceptual Understanding:}
+
+\begin{itemize}
+\tightlist
+\item
+  A dotfiles repository is the source code for a development
+  environment. Like application code, it should live in git, be tested
+  before deployment, and have a migration path for breaking changes.
+\item
+  Cloud-sync and git are fundamentally different synchronisation
+  mechanisms with conflicting write patterns. Using cloud storage as a
+  substitute for git version control is not a safe design; it provides
+  neither the branching, diffing, nor rollback capabilities of git,
+  while adding race-condition risk.
+\item
+  The distance between a written architecture and an executed one
+  accumulates debt. Post 24's design was correct, but the gap between
+  the written plan and the actual filesystem meant three months of
+  configuration changes had no version history.
+\item
+  An explicit inventory of sensitive files, written before the first
+  \texttt{git\ add}, is a one-time cost that prevents a very expensive
+  recovery. Credential rotation after an accidental commit is not
+  hypothetical; it has happened to experienced engineers.
+\end{itemize}
+
+\textbf{Technical Skills:}
+
+\begin{itemize}
+\tightlist
+\item
+  The \texttt{link\_file} pattern (back up existing files with a
+  timestamp, then create a symlink) makes \texttt{install.sh} idempotent
+  and re-runnable without destroying local changes.
+\item
+  The \texttt{\_\_USER\_\_} substitution pattern for launchd plists is a
+  clean solution to the constraint that macOS \texttt{launchd} does not
+  expand \texttt{\textasciitilde{}} in plist files.
+\item
+  A \texttt{-\/-dry-run} flag in shell scripts (print every action
+  without executing) is low-cost to implement and essential for
+  validating an installer on a production machine before committing.
+\item
+  Separating package manifests (\texttt{Brewfile},
+  \texttt{pipx-tools.txt}, \texttt{nvim-plugins.lua}) from the install
+  script means adding a new tool requires one line in a manifest file,
+  not an edit to the installer logic.
+\end{itemize}
+
+\textbf{Gotchas and Pitfalls:}
+
+\begin{itemize}
+\tightlist
+\item
+  The order of operations matters: \texttt{.gitignore} before
+  \texttt{git\ init}, \texttt{git\ status} review before
+  \texttt{git\ add}, \texttt{-\/-dry-run} before the real run. Any of
+  these steps skipped creates a problem that is harder to fix than to
+  prevent.
+\item
+  Runtime caches and downloaded plugin code are frequently mixed with
+  user configuration in \texttt{\textasciitilde{}/.config}. The rule is:
+  if a directory would be regenerated by running a tool, it is not user
+  configuration and must not be tracked in git.
+\item
+  \texttt{\textasciitilde{}/bin} as a Dropbox symlink works on the
+  primary machine but produces a dangling symlink on any other machine.
+  The per-file symlink pattern is more verbose but correct across
+  environments.
+\item
+  The \texttt{rclone} configuration file
+  (\texttt{\textasciitilde{}/.config/rclone/rclone.conf}) contains OAuth
+  tokens and must be scrubbed of credentials before it is committed,
+  even to a private repository.
+\end{itemize}
+
+\subsection{Limitations}\label{limitations}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Single-user scope:} \texttt{install.sh} deploys to
+  \texttt{\$HOME} and makes no attempt to set up system-level
+  configuration (\texttt{/etc/}, \texttt{/usr/local/}, or system-wide
+  launchd daemons).
+\item
+  \textbf{macOS-centric launchd:} the launchd plist handling is macOS
+  only. A Linux equivalent using systemd user units would require a
+  parallel code path that this version does not provide.
+\item
+  \textbf{No conflict resolution:} if \texttt{install.sh} is run on a
+  machine that already has dotfiles managed by a different tool (e.g.,
+  chezmoi or GNU Stow), the backup-and-replace strategy may interfere
+  with that tool's state.
+\item
+  \textbf{Secrets workflow is manual:} the installer prints a reminder
+  to restore \texttt{\textasciitilde{}/.aws},
+  \texttt{\textasciitilde{}/.ssh}, and
+  \texttt{\textasciitilde{}/.gnupg}, but provides no automation. On a
+  new laptop, secret restoration remains a manual step that must be
+  performed correctly.
+\item
+  \textbf{Plugin manifest not yet complete:} the vim plugin manifest
+  (\texttt{editors/vimrc} + a \texttt{packages/nvim-plugins.lua}
+  manifest) is planned but not yet written. The 22M plugin bundle is
+  excluded from git, which means the first \texttt{vim} launch on a new
+  machine will require a manual \texttt{:PlugInstall}.
+\end{itemize}
+
+\subsection{Opportunities for
+Improvement}\label{opportunities-for-improvement}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Add a \texttt{bootstrap.sh} that installs Homebrew and git before
+  cloning the dotfiles repo, making the first command on a truly fresh
+  laptop a single \texttt{curl\ \textbar{}\ bash} invocation (with
+  appropriate scrutiny of what that script does).
+\item
+  Write a systemd user-unit equivalent of the launchd plist section,
+  conditioned on \texttt{{[}{[}\ "\$OSTYPE"\ ==\ "linux-gnu"*\ {]}{]}},
+  so the same dotfiles repository works on Ubuntu development VMs.
+\item
+  Add GitHub Actions CI that runs \texttt{install.sh\ -\/-dry-run} and
+  \texttt{make\ lint} on macOS and Ubuntu runners after every push,
+  catching cross-platform breakage before a laptop bootstrap.
+\item
+  Complete the vim plugin manifest and add a post-install hook to
+  \texttt{install.sh} that runs \texttt{:PlugInstall} in headless vim,
+  making the editor ready without manual intervention.
+\item
+  Evaluate \texttt{git-crypt} for encrypting a small set of
+  near-sensitive configs (rclone config, mbsyncrc) so they can live in
+  the repository without requiring manual scrubbing of credentials.
+\end{enumerate}
+
+\section{Wrapping Up}\label{wrapping-up}
+
+The gap between a correct architecture and an executed one is easy to
+accumulate and expensive to close. Post 24 described the right design
+for a portable dotfiles repository in February 2026; this post documents
+the audit that revealed why it had not been executed, identifies the
+three blockers (no version control, hardcoded Dropbox paths, and
+sensitive files without an inventory), and provides the concrete scripts
+and migration procedure.
+
+The highest-leverage change is also the simplest: \texttt{git\ init} in
+a directory outside cloud sync, with a \texttt{.gitignore} written
+before the first commit. Everything else, the \texttt{install.sh}
+parameterisation, the launchd \texttt{\_\_USER\_\_} substitution, the
+plugin-manifest strategy, builds on that foundation.
+
+\textbf{Main takeaways:}
+
+\begin{itemize}
+\tightlist
+\item
+  Cloud sync is not version control. A dotfiles repository outside any
+  cloud-mounted path, with GitHub as the remote, is the correct design.
+\item
+  Write \texttt{.gitignore} before \texttt{git\ init}. This is not a
+  best practice; it is a prerequisite. One sensitive commit requires a
+  full history rewrite and credential rotation.
+\item
+  \texttt{install.sh\ -\/-dry-run} before every real install. The cost
+  of reviewing the plan is ten seconds; the cost of an unexpected
+  overwrite can be an afternoon.
+\item
+  Per-file symlinks in \texttt{\textasciitilde{}/bin} are more verbose
+  than a top-level symlink but are the only pattern that works across
+  machines with different Dropbox configurations.
+\end{itemize}
+
+\section{See Also}\label{see-also}
+
+\textbf{Related posts on this site:}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://focusonr.org/posts/24-setupdotfilesongithub/}{Creating a
+  GitHub Dotfiles Repository} (post 24, 2026-02-11): the architectural
+  design this post implements.
+\end{itemize}
+
+\textbf{Key resources:}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://www.atlassian.com/git/tutorials/dotfiles}{Atlassian
+  Dotfiles Guide}: alternative bare-repository approach without
+  \texttt{install.sh}
+\item
+  \href{https://www.shellcheck.net/}{shellcheck}: static analysis for
+  bash scripts; used in \texttt{make\ lint}
+\item
+  \href{https://pypa.github.io/pipx/}{pipx documentation}: managing
+  Python CLI tools without virtualenv sprawl
+\item
+  \href{https://www.launchd.info/}{launchd.info}: comprehensive
+  reference for macOS launchd plist format and semantics
+\item
+  \href{https://github.com/newren/git-filter-repo}{git-filter-repo}: the
+  correct tool for removing sensitive data from git history (faster and
+  safer than \texttt{git\ filter-branch})
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Reproducibility}\label{reproducibility}
+
+\textbf{Tested configuration:}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Component & Version \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Operating system & macOS 15.4 \\
+zsh & 5.9 \\
+git & 2.45.x \\
+Homebrew & 4.3.x \\
+pipx & 1.5.x \\
+shellcheck & 0.10.x \\
+Last verified & {[}pending{]} \\
+\end{longtable}
+}
+
+\textbf{Configuration artifacts:}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{analysis/configs/install.sh}: full installer source
+\item
+  \texttt{analysis/configs/Makefile}: build targets
+\item
+  \texttt{analysis/configs/gitignore}: \texttt{.gitignore} template
+\item
+  \texttt{analysis/configs/zshenv}: \texttt{\$DOTFILES} /
+  \texttt{\$PRJ\_ROOT} exports
+\end{itemize}
+
+\textbf{To reproduce end-to-end:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ clone git@github.com:rgt47/dotfiles \textasciitilde{}/dotfiles}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/dotfiles}
+\FunctionTok{make}\NormalTok{ test       }\CommentTok{\# dry{-}run + lint}
+\FunctionTok{make}\NormalTok{ install    }\CommentTok{\# deploy symlinks and packages}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\emph{Rendered on 2026-05-17 at 09:27 PDT.} \emph{Source:
+\textasciitilde/prj/qblog/posts/65-multi-laptop-bootstrap/multi-laptop-bootstrap/analysis/report/index.qmd}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Let's Connect}\label{lets-connect}
+
+\emph{Have questions, suggestions, or spot an error? Let me know.}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{GitHub:} \href{https://github.com/rgt47}{rgt47}
+\item
+  \textbf{LinkedIn:} \href{https://linkedin.com/in/rgthomaslab}{Ronald
+  Glenn Thomas}
+\item
+  \textbf{Email:} rgthomas47@gmail.com
+\end{itemize}
+
+I would enjoy hearing from you if:
+
+\begin{itemize}
+\tightlist
+\item
+  You spot a hardcoded assumption in \texttt{install.sh} that breaks on
+  your setup.
+\item
+  You have extended the launchd section to work with systemd on Linux.
+\item
+  You use a different secrets mechanism (\texttt{pass}, \texttt{gopass},
+  or a hardware token) and want to compare notes.
+\item
+  You just want to say hello and connect.
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+
+
+
+\end{document}

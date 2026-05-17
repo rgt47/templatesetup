@@ -1,54 +1,73 @@
 # Image Sources
+*2026-05-17 10:15 PDT*
 
-This directory contains static images used in the blog post. Always document the source and license of each image.
+Images used in post 65, 'Multi-Laptop macOS Bootstrap: Migrating
+Dotfiles to a Versioned Git Repository'.
 
-## penguin-hero.jpg
+All four images were generated via Google Imagen 3 (Gemini) on
+2026-05-17. Processed with ImageMagick: `magick <input>.png
+-resize 1600x -strip -quality 85 <output>.jpg`.
 
-- **Source**: Centralized image storage at `/images/posts/penguin-hero.jpg`
-- **Photographer**: Unknown (from blog assets)
-- **License**: [Check parent repository for attribution]
-- **Usage**: Hero image for blog post listing and opening
+---
 
-## Template for Additional Images
+## hero.jpg
 
-When adding images to this post, use this format:
+- **Source:** Google Imagen 3 via gemini.google.com
+- **Generated:** 2026-05-17
+- **Model:** Imagen 3 (Gemini)
+- **License:** Generated image, no third-party rights
+- **Dimensions:** 1600px wide, 184K
+- **Description:** Two identical closed hardcover notebooks aligned
+  on an oak desk, a thin brass ruler laid across both covers. Soft
+  natural light from the upper left, shallow depth of field.
+- **Metaphor:** Two machines in identical, reproducible
+  configuration, managed from a single source of truth.
+- **Prompt:** See `HERO_IMAGE_PROMPTS.md`, Post 65 hero entry.
 
-### image-name.jpg
+## ambiance1.jpg
 
-- **Source**: [e.g., Unsplash, Wikimedia Commons, etc.]
-- **Photographer/Creator**: [Name]
-- **License**: [CC BY 4.0, CC BY 2.0, Unsplash License, etc.]
-- **URL**: [Link to original if available]
-- **Description**: [What the image shows and why it's used]
-- **Modified**: [If applicable, describe any modifications made]
+- **Source:** Google Imagen 3 via gemini.google.com
+- **Generated:** 2026-05-17
+- **Model:** Imagen 3 (Gemini)
+- **License:** Generated image, no third-party rights
+- **Dimensions:** 1600px wide, 195K
+- **Placement:** After Objectives section
+- **Description:** Lifestyle photograph from above of a wooden desk
+  with three stacks of index cards arranged in a triangle, each
+  stack bound with a rubber band. Reading glasses and a fountain
+  pen cap nearby.
+- **Metaphor:** An inventory taken before the first commit,
+  separating what to track from what to leave behind.
+- **Prompt:** See `HERO_IMAGE_PROMPTS.md`, Post 65 Ambiance 1 entry.
 
-## Adding Images to This Post
+## ambiance2.jpg
 
-1. Save image to this directory: `analysis/media/images/your-image.jpg`
-2. Add entry to this README.md with source and license
-3. Reference in blog post: `![Description](media/images/your-image.jpg){.img-fluid}`
-4. Commit both image and documentation
+- **Source:** Google Imagen 3 via gemini.google.com
+- **Generated:** 2026-05-17
+- **Model:** Imagen 3 (Gemini)
+- **License:** Generated image, no third-party rights
+- **Dimensions:** 1600px wide, 104K
+- **Placement:** After Configuration section
+- **Description:** Editorial photograph of a single metal key resting
+  on a thin folded card on a bare stone surface. Side lighting from
+  the left casts a thin shadow across the card. Shallow depth of
+  field.
+- **Metaphor:** install.sh as the single key that unlocks an
+  identical environment on any new machine.
+- **Prompt:** See `HERO_IMAGE_PROMPTS.md`, Post 65 Ambiance 2 entry.
 
-## Attribution Guidelines
+## ambiance3.jpg
 
-- Always credit photographers/creators
-- Use appropriate open licenses (CC BY, CC BY-SA, etc.)
-- When using freely provided images, maintain attribution
-- Include URLs to original sources when available
-
-## Placeholder coffee images (temporary ambiance slots)
-
-These images are shared placeholders used across all posts until replaced
-with post-specific screenshots or generated images per IMAGE_GENERATION_PLAN.md.
-
-- placeholder-coffee-01.jpg — Photo on Unsplash (ID: wDRR4zu9oMc).
-  White ceramic mug on brown wooden table. Licence: Unsplash Free.
-- placeholder-coffee-02.jpg — Photo on Unsplash (ID: Hy4eZgKCcXI).
-  Black coffee in ceramic mug near pen on open notebook. Licence: Unsplash Free.
-- placeholder-coffee-03.jpg — Photo by Jojo Yuen on Unsplash (ID: dLkBaK_KJbw).
-  Coffee cup, atmospheric. Licence: Unsplash Free.
-- placeholder-coffee-04.jpg — Photo on Unsplash (ID: wiw9kVxFXnU).
-  Clear glass pitcher beside coffee glass, pour-over. Licence: Unsplash Free.
-- placeholder-coffee-05.jpg — Photo on Unsplash (ID: SvnFUJuun78).
-  Coffee being poured into coffee maker, moody. Licence: Unsplash Free.
-
+- **Source:** Google Imagen 3 via gemini.google.com
+- **Generated:** 2026-05-17
+- **Model:** Imagen 3 (Gemini)
+- **License:** Generated image, no third-party rights
+- **Dimensions:** 1600px wide, 127K
+- **Placement:** Before Lessons Learnt section
+- **Description:** Two ceramic mugs of identical form and colour on
+  a wooden table, one slightly in front of the other. A faint wisp
+  of steam rises from the nearer mug. Soft morning light from a
+  window to the right.
+- **Metaphor:** A second workstation brought to the same state as
+  the first, ready to use.
+- **Prompt:** See `HERO_IMAGE_PROMPTS.md`, Post 65 Ambiance 3 entry.
