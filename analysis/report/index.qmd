@@ -102,10 +102,11 @@ analysis/configs/ and shown verbatim in the body.
 
 ============================================================================ -->
 
-![A minimalist desk surface with two closed laptops side by side, a
-terminal window open on one screen, muted grey and warm wood tones.
-Placeholder until topic-appropriate hero is generated.
+![Two identical closed notebooks aligned on an oak desk, a brass ruler
+laid across both covers.
 ](media/images/hero.jpg){.img-fluid width=80%}
+
+*Two machines. One source of truth.*
 
 *A reproducible dotfiles repository makes adding a second workstation
 a two-command operation rather than a day-long archaeology project.*
