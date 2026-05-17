@@ -105,15 +105,14 @@ makes adding a second workstation a two-command operation.*
 
 # Introduction
 
-I did not really appreciate how fragile my shell configuration was
-until I tried to replicate my macOS development environment on a
-second laptop. Every alias, every shell function, every launchd
-scheduled job, and every editor setting lived inside
-`~/Library/CloudStorage/Dropbox/dotfiles/`, a directory with no
-`.git` folder, no version history, no diff capability, and no
-rollback mechanism. The only 'backup' was Dropbox's version history,
-which I discovered was inadequate when a `sed -i` command on a
-cloud-mounted path truncated a 546-line script to zero bytes.
+Post 64, '[Migrating Off Dropbox: Beyond Dotfiles](https://focusonr.org/posts/64-migrating-off-dropbox/)',
+covers migrating project content, shell history, and large binaries
+off cloud sync into a three-layer framework. This post picks up where
+that one ends: the dotfiles layer. After the Dropbox migration, every
+alias, every shell function, every launchd scheduled job, and every
+editor setting lives in `~` as plain files, but with no `.git`
+folder, no version history, no diff capability, and no rollback
+mechanism.
 
 The design for a better arrangement already existed. Post 24,
 '[Creating a GitHub Dotfiles Repository](https://focusonr.org/posts/24-setupdotfilesongithub/)',
