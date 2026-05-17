@@ -1,0 +1,932 @@
+---
+title: "Multi-Laptop macOS Bootstrap: Migrating Dotfiles to a
+  Versioned Git Repository"
+subtitle: "From a Dropbox-synced shell configuration to a portable,
+  installable dotfiles repository with secrets handling and
+  launchd support"
+author: "Ronald 'Ryy' G. Thomas"
+date: "2026-05-17"
+categories: [dotfiles, shell, macos, setup, reproducibility]
+description: "I did not appreciate how fragile my development
+  environment was until I tried to set up a second MacBook and
+  discovered my entire shell configuration had no git history,
+  no rollback, and no deployment mechanism."
+image: "media/images/hero.jpg"
+document-type: "blog"
+draft: true
+execute:
+  echo: true
+  warning: false
+  message: false
+format:
+  html:
+    code-fold: false
+    code-tools: false
+  pdf:
+    pdf-engine: xelatex
+    monofont: 'DejaVu Sans Mono'
+    geometry: margin=1in
+    fontsize: 11pt
+    toc: true
+    toc-depth: 2
+
+---
+
+<!-- ============================================================================
+AUTHOR PROVIDES — concrete inputs the blogger must supply
+
+Every item below maps to a placeholder in the body. Fill in this checklist
+FIRST, then paste your answers into the matching `[bracketed]` slots. Do not
+publish until every box is ticked.
+
+YAML FRONT MATTER
+  [x] title           — filled in
+  [x] subtitle        — filled in
+  [x] date            — 2026-05-17 (target publication)
+  [x] categories      — dotfiles, shell, macos, setup, reproducibility
+  [x] description     — filled in
+  [ ] image           — placeholder; replace with generated hero.jpg
+  [ ] draft: false    — flip when ready
+
+NARRATIVE INPUTS
+  [x] Hook sentence   — 'I did not appreciate X until Y'
+  [x] Pain point      — Dropbox-synced dotfiles with no git history
+  [x] Motivations     — 5 bullets
+  [x] Objectives      — 4 numbered, verifiable end states
+  [x] What is [Tool]? — definition + analogy + concrete example
+  [x] Daily-workflow paragraph
+  [x] Things to Watch Out For — 6 gotchas
+  [x] Lessons Learnt  — 4 conceptual + 4 technical + 4 gotcha bullets
+  [x] Limitations     — 5 bullets
+  [x] Opportunities   — 5 numbered next-step extensions
+  [x] Wrapping Up     — conclusion + main takeaways
+  [x] See Also        — links
+
+CONFIGURATION DELIVERABLES
+  [x] Prerequisites list
+  [x] install.sh — analysis/configs/install.sh
+  [x] Makefile   — analysis/configs/Makefile
+  [x] .gitignore — analysis/configs/gitignore
+  [x] Verification commands
+  [x] Uninstall / rollback steps
+
+VERSION MATRIX
+  [ ] OS + version tested
+  [ ] Tool versions pinned
+  [ ] Date of last verification
+
+IMAGES (4 total: hero + 3 ambiance, all in media/images/)
+  [ ] Hero image (80% width)        — workspace, terminal + laptop
+  [ ] Ambiance image 1 (100% width) — after Objectives
+  [ ] Ambiance image 2 (100% width) — after Configuration
+  [ ] Ambiance image 3 (100% width) — before Lessons Learnt
+  [ ] media/images/README.md        — sources + attribution
+
+CONTACT & METADATA
+  [x] Author name in YAML matches site author
+  [x] Social links in 'Let's Connect' present
+
+============================================================================ -->
+
+<!-- ============================================================================
+POST CONTEXT
+
+This post is a direct sequel to post 24, 'Creating a GitHub Dotfiles
+Repository' (2026-02-11). Post 24 specifies the correct architecture; this
+post documents the audit that revealed why that architecture had never been
+executed, identifies three concrete blockers, and provides the migration
+steps, install.sh, and secrets workflow that post 24 deferred.
+
+The deliverables (install.sh, Makefile, .gitignore) are placed under
+analysis/configs/ and shown verbatim in the body.
+
+============================================================================ -->
+
+![A minimalist desk surface with two closed laptops side by side, a
+terminal window open on one screen, muted grey and warm wood tones.
+Placeholder until topic-appropriate hero is generated.
+](media/images/hero.jpg){.img-fluid width=80%}
+
+*A reproducible dotfiles repository makes adding a second workstation
+a two-command operation rather than a day-long archaeology project.*
+
+# Introduction
+
+I did not really appreciate how fragile my shell configuration was
+until I tried to replicate my macOS development environment on a
+second laptop. Every alias, every shell function, every launchd
+scheduled job, and every editor setting lived inside
+`~/Library/CloudStorage/Dropbox/dotfiles/`, a directory with no
+`.git` folder, no version history, no diff capability, and no
+rollback mechanism. The only 'backup' was Dropbox's version history,
+which I discovered was inadequate when a `sed -i` command on a
+cloud-mounted path truncated a 546-line script to zero bytes.
+
+The design for a better arrangement already existed. Post 24,
+'[Creating a GitHub Dotfiles Repository](https://focusonr.org/posts/24-setupdotfilesongithub/)',
+laid out the correct architecture: a standalone `~/dotfiles` git
+repository outside any cloud-sync path, an `install.sh` that creates
+symlinks with timestamped backups, platform detection via `$OSTYPE`,
+a `Brewfile`, and an `.env.local` pattern for secrets. That post was
+written and published in February 2026 but never executed against the
+actual configuration.
+
+This post documents the audit that identified three concrete blockers
+preventing multi-laptop deployment, and the migration procedure that
+resolves them. It extends post 24's design with five additions: launchd
+plist parameterisation, a pipx tool manifest, a vim plugin-manager
+strategy, an explicit sensitive-files inventory, and migration steps
+from the current half-installed state.
+
+## Motivations
+
+- The `tn` incident (a `sed -i.bak` against a Dropbox path truncated
+  a production script to zero bytes) demonstrated that cloud-mounted
+  paths are not safe working trees; git is the correct synchroniser.
+- Setting up a second MacBook without a deployment mechanism means
+  manually recreating months of accumulated configuration from
+  memory, which is both error-prone and time-consuming.
+- Hardcoded `~/Library/CloudStorage/Dropbox/...` paths in scripts and
+  launchd plists break silently on any machine where Dropbox is
+  absent, uses a different account, or is installed at a legacy path.
+- Sensitive files (`~/.aws`, `~/.ssh`, `~/.gnupg`) live adjacent to
+  tracked dotfiles with no formal inventory and no explicit decision
+  about what belongs in git versus what must remain local.
+- Understanding the gap between a written architecture and an executed
+  one is itself useful: post 24's design was sound but several
+  category errors (vim plugin bundles treated as config, runtime
+  caches mixed with user config) were only visible during an actual
+  audit.
+
+## Objectives
+
+1. Identify every file that must be tracked, excluded, or handled
+   via a separate secrets mechanism, producing an explicit inventory.
+2. Create `~/dotfiles` as a git repository outside any cloud-sync
+   path, structured per post 24's layout, and push it to a private
+   GitHub repository.
+3. Write and test `install.sh` with `--dry-run` support, launchd
+   `__USER__` substitution, and per-file symlinks for `~/bin`.
+4. Verify that a clean bootstrap (on a fresh user account or VM) runs
+   without hardcoded-path failures, undefined variable errors, or
+   leaked secrets.
+
+![Ambiance image 1: a single open laptop on a wooden desk, terminal
+visible, soft natural light. Placeholder.
+](media/images/ambiance1.jpg){.img-fluid}
+
+# What is a Dotfiles Repository?
+
+A dotfiles repository is a version-controlled directory that stores
+shell configuration files, editor settings, and system scripts in a
+form that can be deployed to any new machine with a single command.
+Think of it as the source code for your development environment: just
+as application code can be cloned and built on a fresh server, a
+dotfiles repository can be cloned and installed on a fresh laptop.
+
+The concrete benefit is reproducibility. Without a dotfiles
+repository, two machines diverge the moment you customise one of
+them. With one, the command `git clone git@github.com:rgt47/dotfiles
+~/dotfiles && cd ~/dotfiles && ./install.sh` brings a new laptop to
+the same state as the primary machine, minus secrets that must be
+installed by a separate mechanism.
+
+# Prerequisites
+
+This post assumes:
+
+- **Operating system:** macOS 13+ (Ventura or later); the
+  architecture extends to Ubuntu 22.04+ with minor adjustments
+- **Hardware:** Apple Silicon or Intel Mac (the scripts are
+  architecture-agnostic)
+- **Already installed:** git, Homebrew, zsh 5.9+, pipx (for Python
+  CLI tools)
+- **Background knowledge:** comfort editing dotfiles, writing bash
+  scripts, and running shell commands; familiarity with post 24's
+  design
+- **GitHub account:** with SSH access configured (the repository must
+  be private; never use a public repository for dotfiles)
+- **Time required:** 3-4 hours for the initial migration; 30 minutes
+  to bootstrap subsequent laptops
+
+If you are starting from scratch rather than migrating, post 24's
+step-by-step walkthrough is the right entry point. This post assumes
+the Dropbox-based status quo described above.
+
+# Audit Findings: Three Blockers
+
+Before writing any code, an audit of `~/bin`, `~`, `~/.config`, and
+`~/.local` identified three issues that must be resolved before
+dotfiles can safely be exported to a second machine.
+
+## Blocker 1: No Version Control
+
+`~/Library/CloudStorage/Dropbox/dotfiles/` has no `.git` directory.
+The entire shell configuration is a Dropbox-synced tree with no
+history, no diff capability, and no rollback. Dropbox version history
+is the only recovery path, and as the `tn` incident showed, that
+recovery is not guaranteed for in-place edits.
+
+The repository must live at `~/dotfiles`, outside any cloud-sync
+path. Git writes constantly to `.git/index`, `.git/HEAD`, and
+`.git/refs/...`; a cloud provider syncing those writes
+simultaneously causes race conditions that corrupt the index and can
+truncate files to zero bytes. The `~/dotfiles` directory is
+local to each machine; git itself (with GitHub as the remote) is
+the synchroniser.
+
+## Blocker 2: Hardcoded Dropbox Paths
+
+Every script in `~/bin/launchd/`, the launchd plists, the `cdpath`
+in `.zshrc`, and the `vz` alias all hardcode
+`~/Library/CloudStorage/Dropbox/...`. On a second laptop where
+Dropbox is absent, uses a different account, or is installed at the
+legacy path (`~/Dropbox`), every reference fails silently.
+
+The fix is a single environment variable sourced from `~/.zshenv`:
+
+```sh
+# ~/.zshenv
+export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+export PRJ_ROOT="${PRJ_ROOT:-$HOME/Dropbox/prj}"
+[[ -d "$PRJ_ROOT" ]] || \
+    export PRJ_ROOT="$HOME/Library/CloudStorage/Dropbox/prj"
+```
+
+Every script and config then references `$DOTFILES` and `$PRJ_ROOT`
+rather than literal paths.
+
+## Blocker 3: Sensitive Files Without an Inventory
+
+Confirmed sensitive items in `~`:
+
+```
+~/.aws      AWS credentials (plaintext)
+~/.docker   registry tokens
+~/.env      project secrets
+~/.gnupg    private keys
+~/.npmrc    npm registry token
+~/.password-store  pass database (encrypted)
+~/.ssh      SSH private keys
+~/.vpn      VPN configuration
+```
+
+These must never be committed to git, even in a private repository,
+because they appear in every cloned working tree and persist in
+history forever. A `.gitignore` written before the first `git add`
+is the only reliable control; after the first commit, sensitive data
+requires a full `git filter-repo` rewrite and credential rotation.
+
+# Installation: Creating ~/dotfiles
+
+The migration proceeds in three phases: copy, restructure, and commit.
+
+## Phase 1: Copy Existing Content
+
+```bash
+# Create the new home outside cloud sync
+mkdir -p ~/dotfiles
+cd ~/dotfiles
+mkdir -p shell git editors system config bin launchd packages secrets
+
+# Shell configuration: drop leading dots
+cp ~/Library/CloudStorage/Dropbox/dotfiles/zshrc  shell/zshrc
+cp ~/.zshenv                                       shell/zshenv
+cp ~/.gitignore_global                             git/gitignore_global
+cp ~/.lintr                                        lintr
+cp ~/.mbsyncrc                                     mbsyncrc
+
+# bin scripts: copy real files, not the symlink farm
+cp -RL ~/Library/CloudStorage/Dropbox/bin/* bin/
+rm -f bin/*.bak.*
+
+# XDG configs (selective; leave runtime state behind)
+for d in ghostty kitty karabiner gh rclone mutt nvim; do
+    [ -d ~/.config/$d ] && cp -R ~/.config/$d config/$d
+done
+```
+
+Do not copy `~/.config/vim/` (22M of downloaded plugin bundles),
+`~/.config/coc/` (1.6M of language-server cache), or any directory
+under `~/.config/` that contains runtime state rather than user
+configuration. These will be regenerated on each laptop by the
+plugin manager.
+
+## Phase 2: Write .gitignore Before git init
+
+This step is not optional. Write the `.gitignore` file before the
+first `git add`. One commit with a credential in history requires a
+full rewrite.
+
+```gitignore
+# Sensitive directories: NEVER commit
+secrets/*
+!secrets/README.md
+**/.env
+**/.env.local
+**/.env.*.local
+**/credentials*
+**/*.pem
+**/*.key
+**/id_rsa*
+**/id_ed25519*
+
+# Per-machine state
+*.backup.*
+.DS_Store
+.zsh_history
+.viminfo
+.zcompdump*
+
+# Plugin manager output (regenerated at install time)
+config/vim/bundle/
+config/vim/plugged/
+config/nvim/plugged/
+config/nvim/coc/
+```
+
+## Phase 3: Commit and Push
+
+```bash
+cd ~/dotfiles
+git init
+git add .
+git status   # review carefully before committing
+git commit -m 'initial import from Dropbox dotfiles'
+gh repo create rgt47/dotfiles --private --source=. --push
+```
+
+Review `git status` output before committing. If any file in the
+listing looks sensitive, add it to `.gitignore` and re-check before
+proceeding.
+
+# Configuration
+
+## install.sh
+
+The installer creates symlinks from `~/dotfiles` into `$HOME`,
+handles launchd plist parameterisation, and installs packages via
+Homebrew and pipx. A `--dry-run` flag prints every action without
+executing it.
+
+```bash
+#!/bin/bash
+# install.sh: deploy dotfiles into $HOME via symlinks.
+# Idempotent: existing files are backed up with a timestamp
+# suffix before being replaced.
+set -euo pipefail
+
+DRY_RUN=0
+[[ "${1:-}" == "--dry-run" ]] && DRY_RUN=1
+
+DOTFILES="$(cd "$(dirname "$0")" && pwd)"
+
+log()      { echo "[INFO]  $*"; }
+warn()     { echo "[WARN]  $*" >&2; }
+do_or_say() {
+  [[ $DRY_RUN -eq 1 ]] && echo "[DRY] $*" || "$@"
+}
+
+link_file() {
+  local src="$1" dest="$2"
+  if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+    warn "$dest exists, creating backup"
+    do_or_say mv "$dest" \
+      "${dest}.backup.$(date +%Y%m%d_%H%M%S)"
+  fi
+  do_or_say mkdir -p "$(dirname "$dest")"
+  do_or_say ln -sfn "$src" "$dest"
+  log "Linked $src -> $dest"
+}
+
+# Shell, git, editors -----------------------------------------------
+link_file "$DOTFILES/shell/zshrc"  "$HOME/.zshrc"
+link_file "$DOTFILES/shell/zshenv" "$HOME/.zshenv"
+link_file "$DOTFILES/git/gitconfig"         "$HOME/.gitconfig"
+link_file "$DOTFILES/git/gitignore_global"  "$HOME/.gitignore_global"
+link_file "$DOTFILES/editors/vimrc" \
+  "$HOME/.config/vim/vimrc"
+
+# XDG configs -------------------------------------------------------
+for d in "$DOTFILES"/config/*/; do
+  name="$(basename "$d")"
+  link_file "$d" "$HOME/.config/$name"
+done
+
+# ~/bin scripts: per-file symlinks (not a top-level link) -----------
+do_or_say mkdir -p "$HOME/bin"
+for f in "$DOTFILES"/bin/*; do
+  link_file "$f" "$HOME/bin/$(basename "$f")"
+done
+
+# launchd plists: substitute __USER__ then install ------------------
+do_or_say mkdir -p "$HOME/Library/LaunchAgents"
+for plist in "$DOTFILES"/launchd/*.plist; do
+  name="$(basename "$plist")"
+  target="$HOME/Library/LaunchAgents/$name"
+  do_or_say sed "s|__USER__|$USER|g" "$plist" > "$target"
+  log "Installed $target (with __USER__ -> $USER)"
+done
+
+# Package managers --------------------------------------------------
+if command -v brew >/dev/null 2>&1; then
+  do_or_say brew bundle \
+    --file="$DOTFILES/packages/Brewfile"
+fi
+if command -v pipx >/dev/null 2>&1 && \
+   [ -f "$DOTFILES/packages/pipx-tools.txt" ]; then
+  while read -r tool; do
+    [[ -z "$tool" || "$tool" =~ ^# ]] && continue
+    do_or_say pipx install --force "$tool"
+  done < "$DOTFILES/packages/pipx-tools.txt"
+fi
+
+log "Install complete. Manual follow-ups:"
+log "  - Copy shell/env.local.example to ~/.env.local"
+log "  - Restore ~/.aws, ~/.ssh, ~/.gnupg from secure storage"
+log "  - Reload launchd: launchctl bootstrap gui/\$UID \
+~/Library/LaunchAgents/*.plist"
+log "  - Restart shell: source ~/.zshrc"
+```
+
+The full source is at `analysis/configs/install.sh`.
+
+Three deviations from post 24's original `install.sh` deserve
+explanation:
+
+1. **`--dry-run` flag:** prints every operation without executing,
+   allowing review before the first real run on a new machine.
+2. **XDG-config and `~/bin` loops:** a new helper script or config
+   directory is picked up automatically without editing `install.sh`.
+3. **launchd `__USER__` substitution:** macOS `launchd` does not
+   expand `~` in plist files, so absolute paths are required; the
+   installer writes the substituted plist to `~/Library/LaunchAgents/`
+   rather than tracking the substituted form in git.
+
+## Makefile
+
+```make
+.PHONY: install update lint backup test help
+
+help:
+	@echo "Targets:"
+	@echo "  install   create symlinks; install brew/pipx packages"
+	@echo "  update    git pull, then re-run install.sh"
+	@echo "  lint      shellcheck bash; zsh -n zsh scripts"
+	@echo "  backup    snapshot current dotfiles"
+	@echo "  test      install.sh --dry-run plus lint"
+
+install:
+	./install.sh
+
+update:
+	git pull origin main
+	./install.sh
+
+lint:
+	find bin -type f -name '*.sh' -exec shellcheck {} \;
+	find shell -type f -exec zsh -n {} \;
+
+backup:
+	@d=backups/$$(date +%Y%m%d-%H%M%S) && mkdir -p "$$d" && \
+	for f in .zshrc .zshenv .gitconfig .vimrc; do \
+	  [ -e "$$HOME/$$f" ] && cp "$$HOME/$$f" "$$d/"; \
+	done
+
+test:
+	./install.sh --dry-run
+	$(MAKE) lint
+```
+
+The full source is at `analysis/configs/Makefile`.
+
+## Capturing Package Manifests
+
+Before the first push, capture the current toolchain so that a new
+laptop gets the same packages:
+
+```bash
+brew bundle dump \
+  --file=~/dotfiles/packages/Brewfile --force
+
+# pipx tools
+pipx list --short \
+  | awk '{print $1}' > ~/dotfiles/packages/pipx-tools.txt
+```
+
+![Ambiance image 2: a terminal showing git log output and file
+structure, warm overhead lighting, shallow depth of field.
+Placeholder.
+](media/images/ambiance2.jpg){.img-fluid}
+
+# The Migration Procedure
+
+With `~/dotfiles` populated and committed, deploy to `$HOME`:
+
+```bash
+cd ~/dotfiles
+./install.sh --dry-run   # review all planned actions
+./install.sh             # execute
+```
+
+After the installer runs:
+
+1. Reload launchd agents:
+   ```bash
+   launchctl bootstrap gui/$UID \
+     ~/Library/LaunchAgents/*.plist
+   ```
+2. Restart the shell: `source ~/.zshrc`
+3. Verify a sample alias or function resolves correctly.
+
+To bootstrap a second laptop:
+
+```bash
+git clone git@github.com:rgt47/dotfiles ~/dotfiles
+cd ~/dotfiles && ./install.sh
+```
+
+Then manually restore `~/.aws`, `~/.ssh`, and `~/.gnupg` from
+secure storage (1Password, `pass`, or hand-transfer). These are
+never in git; the installer prints a reminder.
+
+# Verification
+
+```bash
+# 1. Confirm symlinks are in place
+ls -la ~/.zshrc ~/.gitconfig ~/.config/ghostty
+
+# 2. Check that DOTFILES and PRJ_ROOT resolve correctly
+echo "$DOTFILES"
+echo "$PRJ_ROOT"
+
+# 3. Verify launchd jobs loaded without error
+launchctl list | grep local.
+
+# 4. Confirm pipx tools are installed
+pipx list --short
+
+# 5. Dry-run passes cleanly on the current machine
+cd ~/dotfiles && make test
+```
+
+Step 5 (`make test`) runs `install.sh --dry-run` and `make lint`,
+which exercises `shellcheck` against every script in `bin/`. A clean
+run with no warnings confirms the repository is in a deployable
+state.
+
+# Daily Workflow
+
+After setup, the dotfiles repository becomes a standard git project.
+
+| Command                           | Action                                  |
+|-----------------------------------|-----------------------------------------|
+| `cd ~/dotfiles && git diff`       | Review uncommitted config changes       |
+| `make test`                       | Lint + dry-run before committing        |
+| `make install`                    | Re-link after adding a new config file  |
+| `make update`                     | Pull from GitHub and re-run install     |
+| `make backup`                     | Snapshot current `~` dotfiles           |
+| `brew bundle dump --force`        | Refresh Brewfile after new installs     |
+| `pipx list --short > pipx-tools.txt` | Update pipx manifest               |
+
+The repository should be treated like any other codebase: commit
+small, test before pushing, and keep the `CHANGELOG` or commit
+messages descriptive enough to understand what changed and why.
+
+# Things to Watch Out For
+
+1. **Write `.gitignore` before `git init`, not after.** If any
+   sensitive file is committed even once, it must be removed with
+   `git filter-repo` and every credential it contained must be
+   rotated. There is no lighter-weight remediation.
+
+2. **Do not place the dotfiles repo inside Dropbox, iCloud, or Google
+   Drive.** Git writes to `.git/index`, `.git/HEAD`, and ref files
+   continuously; a cloud provider racing to sync those writes can
+   corrupt the index or truncate files to zero bytes. This is the
+   same failure mode as the `tn` incident (2026-05-03).
+
+3. **The launchd `__USER__` substitution writes to
+   `~/Library/LaunchAgents/`, not back to the repo.** If you edit a
+   plist in `~/dotfiles/launchd/` and re-run `install.sh`, the
+   substituted file is overwritten in place. Never `git add` the
+   file from `~/Library/LaunchAgents/`; always edit the template
+   in `~/dotfiles/launchd/`.
+
+4. **vim plugin bundle directories must not be tracked.** The 22M
+   `~/.config/vim/` directory is almost entirely downloaded plugin
+   code managed by vim-plug or Vundle. Track only the `vimrc` and
+   the plugin manifest; the installer should run the plugin manager
+   on first boot. The same applies to `~/.config/coc/` (1.6M of
+   language-server cache). Add both to `.gitignore` before the first
+   commit.
+
+5. **`~/bin` must be a real directory populated by per-file symlinks,
+   not a symlink to a Dropbox directory.** A top-level `~/bin ->
+   ~/Library/CloudStorage/Dropbox/bin` symlink dangles on any
+   machine without Dropbox. The installer creates individual symlinks
+   from `~/dotfiles/bin/<script>` to `~/bin/<script>`.
+
+6. **Test `install.sh --dry-run` on a non-primary user account before
+   running it on a second laptop.** The first dry-run on a fresh
+   environment will surface hardcoded paths and assumptions invisible
+   on the primary machine. Identify and fix them before the real
+   bootstrap.
+
+# Uninstall / Rollback
+
+To remove the dotfiles installation and restore the previous state:
+
+```bash
+# 1. Reverse the symlinks (restores any .backup.TIMESTAMP files)
+for f in ~/.zshrc ~/.zshenv ~/.gitconfig ~/.gitignore_global; do
+  backup=$(ls "${f}.backup."* 2>/dev/null | tail -1)
+  if [ -L "$f" ] && [ -n "$backup" ]; then
+    rm "$f" && mv "$backup" "$f"
+  fi
+done
+
+# 2. Remove ~/bin per-file symlinks (leaves non-symlinked files)
+find ~/bin -maxdepth 1 -type l -delete
+
+# 3. Unload launchd agents
+launchctl bootout gui/$UID \
+  ~/Library/LaunchAgents/local.*.plist
+
+# 4. Remove the installed plists
+rm ~/Library/LaunchAgents/local.*.plist
+
+# 5. Remove the ~/dotfiles repo (optional)
+rm -rf ~/dotfiles
+```
+
+If the `.backup.TIMESTAMP` files were not created (first-run on a
+machine with no prior dotfiles), step 1 produces empty symlinks that
+must be removed manually. The `--dry-run` flag on `install.sh`
+shows exactly which files would be backed up before the real run.
+
+![Ambiance image 3: two laptops open side by side on a shared desk,
+matching terminal sessions, muted earth tones. Placeholder.
+](media/images/ambiance3.jpg){.img-fluid}
+
+# What Did We Learn?
+
+## Lessons Learnt
+
+**Conceptual Understanding:**
+
+- A dotfiles repository is the source code for a development
+  environment. Like application code, it should live in git, be
+  tested before deployment, and have a migration path for breaking
+  changes.
+- Cloud-sync and git are fundamentally different synchronisation
+  mechanisms with conflicting write patterns. Using cloud storage
+  as a substitute for git version control is not a safe design;
+  it provides neither the branching, diffing, nor rollback
+  capabilities of git, while adding race-condition risk.
+- The distance between a written architecture and an executed one
+  accumulates debt. Post 24's design was correct, but the
+  gap between the written plan and the actual filesystem meant
+  three months of configuration changes had no version history.
+- An explicit inventory of sensitive files, written before the
+  first `git add`, is a one-time cost that prevents a very
+  expensive recovery. Credential rotation after an accidental
+  commit is not hypothetical; it has happened to experienced
+  engineers.
+
+**Technical Skills:**
+
+- The `link_file` pattern (back up existing files with a timestamp,
+  then create a symlink) makes `install.sh` idempotent and
+  re-runnable without destroying local changes.
+- The `__USER__` substitution pattern for launchd plists is a clean
+  solution to the constraint that macOS `launchd` does not expand
+  `~` in plist files.
+- A `--dry-run` flag in shell scripts (print every action without
+  executing) is low-cost to implement and essential for validating
+  an installer on a production machine before committing.
+- Separating package manifests (`Brewfile`, `pipx-tools.txt`,
+  `nvim-plugins.lua`) from the install script means adding a new
+  tool requires one line in a manifest file, not an edit to the
+  installer logic.
+
+**Gotchas and Pitfalls:**
+
+- The order of operations matters: `.gitignore` before `git init`,
+  `git status` review before `git add`, `--dry-run` before the real
+  run. Any of these steps skipped creates a problem that is harder
+  to fix than to prevent.
+- Runtime caches and downloaded plugin code are frequently mixed
+  with user configuration in `~/.config`. The rule is: if a
+  directory would be regenerated by running a tool, it is not
+  user configuration and must not be tracked in git.
+- `~/bin` as a Dropbox symlink works on the primary machine but
+  produces a dangling symlink on any other machine. The per-file
+  symlink pattern is more verbose but correct across environments.
+- The `rclone` configuration file (`~/.config/rclone/rclone.conf`)
+  contains OAuth tokens and must be scrubbed of credentials before
+  it is committed, even to a private repository.
+
+## Limitations
+
+- **Single-user scope:** `install.sh` deploys to `$HOME` and makes
+  no attempt to set up system-level configuration (`/etc/`,
+  `/usr/local/`, or system-wide launchd daemons).
+- **macOS-centric launchd:** the launchd plist handling is macOS
+  only. A Linux equivalent using systemd user units would require
+  a parallel code path that this version does not provide.
+- **No conflict resolution:** if `install.sh` is run on a machine
+  that already has dotfiles managed by a different tool (e.g.,
+  chezmoi or GNU Stow), the backup-and-replace strategy may
+  interfere with that tool's state.
+- **Secrets workflow is manual:** the installer prints a reminder to
+  restore `~/.aws`, `~/.ssh`, and `~/.gnupg`, but provides no
+  automation. On a new laptop, secret restoration remains a
+  manual step that must be performed correctly.
+- **Plugin manifest not yet complete:** the vim plugin manifest
+  (`editors/vimrc` + a `packages/nvim-plugins.lua` manifest) is
+  planned but not yet written. The 22M plugin bundle is excluded
+  from git, which means the first `vim` launch on a new machine
+  will require a manual `:PlugInstall`.
+
+## Opportunities for Improvement
+
+1. Add a `bootstrap.sh` that installs Homebrew and git before
+   cloning the dotfiles repo, making the first command on a truly
+   fresh laptop a single `curl | bash` invocation (with appropriate
+   scrutiny of what that script does).
+2. Write a systemd user-unit equivalent of the launchd plist
+   section, conditioned on `[[ "$OSTYPE" == "linux-gnu"* ]]`, so the
+   same dotfiles repository works on Ubuntu development VMs.
+3. Add GitHub Actions CI that runs `install.sh --dry-run` and
+   `make lint` on macOS and Ubuntu runners after every push,
+   catching cross-platform breakage before a laptop bootstrap.
+4. Complete the vim plugin manifest and add a post-install hook
+   to `install.sh` that runs `:PlugInstall` in headless vim,
+   making the editor ready without manual intervention.
+5. Evaluate `git-crypt` for encrypting a small set of
+   near-sensitive configs (rclone config, mbsyncrc) so they can
+   live in the repository without requiring manual scrubbing
+   of credentials.
+
+# Wrapping Up
+
+The gap between a correct architecture and an executed one is
+easy to accumulate and expensive to close. Post 24 described the
+right design for a portable dotfiles repository in February 2026;
+this post documents the audit that revealed why it had not been
+executed, identifies the three blockers (no version control,
+hardcoded Dropbox paths, and sensitive files without an inventory),
+and provides the concrete scripts and migration procedure.
+
+The highest-leverage change is also the simplest: `git init` in a
+directory outside cloud sync, with a `.gitignore` written before
+the first commit. Everything else, the `install.sh` parameterisation,
+the launchd `__USER__` substitution, the plugin-manifest strategy,
+builds on that foundation.
+
+**Main takeaways:**
+
+- Cloud sync is not version control. A dotfiles repository outside
+  any cloud-mounted path, with GitHub as the remote, is the
+  correct design.
+- Write `.gitignore` before `git init`. This is not a best practice;
+  it is a prerequisite. One sensitive commit requires a full history
+  rewrite and credential rotation.
+- `install.sh --dry-run` before every real install. The cost of
+  reviewing the plan is ten seconds; the cost of an unexpected
+  overwrite can be an afternoon.
+- Per-file symlinks in `~/bin` are more verbose than a top-level
+  symlink but are the only pattern that works across machines with
+  different Dropbox configurations.
+
+# See Also
+
+**Related posts on this site:**
+
+- [Creating a GitHub Dotfiles Repository](https://focusonr.org/posts/24-setupdotfilesongithub/)
+  (post 24, 2026-02-11): the architectural design this post
+  implements.
+
+**Key resources:**
+
+- [Atlassian Dotfiles Guide](https://www.atlassian.com/git/tutorials/dotfiles):
+  alternative bare-repository approach without `install.sh`
+- [shellcheck](https://www.shellcheck.net/): static analysis for
+  bash scripts; used in `make lint`
+- [pipx documentation](https://pypa.github.io/pipx/): managing
+  Python CLI tools without virtualenv sprawl
+- [launchd.info](https://www.launchd.info/): comprehensive reference
+  for macOS launchd plist format and semantics
+- [git-filter-repo](https://github.com/newren/git-filter-repo):
+  the correct tool for removing sensitive data from git history
+  (faster and safer than `git filter-branch`)
+
+---
+
+# Reproducibility
+
+**Tested configuration:**
+
+| Component        | Version              |
+|------------------|----------------------|
+| Operating system | macOS 15.4           |
+| zsh              | 5.9                  |
+| git              | 2.45.x               |
+| Homebrew         | 4.3.x                |
+| pipx             | 1.5.x                |
+| shellcheck       | 0.10.x               |
+| Last verified    | [pending]            |
+
+**Configuration artifacts:**
+
+- `analysis/configs/install.sh`: full installer source
+- `analysis/configs/Makefile`: build targets
+- `analysis/configs/gitignore`: `.gitignore` template
+- `analysis/configs/zshenv`: `$DOTFILES` / `$PRJ_ROOT` exports
+
+**To reproduce end-to-end:**
+
+```bash
+git clone git@github.com:rgt47/dotfiles ~/dotfiles
+cd ~/dotfiles
+make test       # dry-run + lint
+make install    # deploy symlinks and packages
+```
+
+---
+
+*Rendered on 2026-05-17 at 09:27 PDT.*<br>
+*Source: ~/prj/qblog/posts/65-multi-laptop-bootstrap/multi-laptop-bootstrap/analysis/report/index.qmd*
+
+---
+
+# Let's Connect
+
+*Have questions, suggestions, or spot an error? Let me know.*
+
+- **GitHub:** [rgt47](https://github.com/rgt47)
+- **LinkedIn:** [Ronald Glenn Thomas](https://linkedin.com/in/rgthomaslab)
+- **Email:** rgthomas47@gmail.com
+
+I would enjoy hearing from you if:
+
+- You spot a hardcoded assumption in `install.sh` that breaks on
+  your setup.
+- You have extended the launchd section to work with systemd on
+  Linux.
+- You use a different secrets mechanism (`pass`, `gopass`, or a
+  hardware token) and want to compare notes.
+- You just want to say hello and connect.
+
+---
+
+<!-- ============================================================================
+PRE-PUBLISH QA CHECKLIST: verify each item BEFORE setting draft: false
+
+[ ] YAML
+    [ ] title, subtitle, date, categories, description, image filled in
+    [ ] document-type: 'blog'
+    [ ] draft: false
+
+[ ] Narrative complete (no remaining `[bracketed]` placeholders)
+    [ ] grep '\[' index.qmd returns only legitimate code/links
+
+[ ] Configuration artifacts present and tested
+    [ ] install.sh present at analysis/configs/install.sh
+    [ ] Makefile present at analysis/configs/Makefile
+    [ ] .gitignore template present at analysis/configs/gitignore
+    [ ] install.sh tested with --dry-run on primary machine
+    [ ] install.sh tested on a fresh user account or VM
+    [ ] Verification commands produce the documented output
+    [ ] Uninstall / rollback steps documented
+
+[ ] Things to Watch Out For
+    [ ] At least 5 gotchas listed
+    [ ] Each gotcha has both a symptom AND a fix
+
+[ ] Visual design
+    [ ] 1 hero image (width=80%) immediately below AUTHOR PROVIDES block
+    [ ] Exactly 3 ambiance images ({.img-fluid} only, no width=NN%):
+        after Objectives, after Configuration, before Lessons Learnt
+    [ ] Hero and ambiance captions describe the actual image
+    [ ] media/images/README.md attributes every image
+
+[ ] Content quality
+    [ ] Zero emoji anywhere
+    [ ] Zero em dashes (use parens or commas)
+    [ ] Single quotes preferred over double quotes in prose
+    [ ] Each command interpreted in plain language
+
+[ ] Reproducibility
+    [ ] Version matrix 'Last verified' field filled in
+    [ ] Config files committed under analysis/configs/
+    [ ] install.sh runnable on a clean machine
+
+[ ] Render verification
+    [ ] quarto render index.qmd produces clean HTML with no warnings
+    [ ] PDF renders without overflow or missing images
+    [ ] Hero image displays in /blog/ listing card
+    [ ] Internal links resolve (post 24 URL correct)
+
+============================================================================ -->
