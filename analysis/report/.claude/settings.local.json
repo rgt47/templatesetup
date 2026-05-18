@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C ~/Dropbox/prj/qblog ls-files --error-unmatch _archive/44-leaving-dropbox)",
+      "Bash(git -C ~/Dropbox/prj/qblog status --short)",
+      "Bash(git -C ~/Dropbox/prj/qblog ls-files _archive/)"
+    ]
+  }
+}
