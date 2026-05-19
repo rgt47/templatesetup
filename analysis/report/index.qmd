@@ -104,7 +104,7 @@ analysis/configs/ and shown verbatim in the body.
 makes adding a second workstation a two-command operation.*
 
 ::: {.callout-note}
-**Multi-Machine Setup Series** -- Recommended reading order:
+**Multi-Machine Setup Series** (recommended reading order):
 [Part 1: Migrating off Dropbox](/posts/64-migrating-off-dropbox/) |
 [Part 2: Multi-Laptop Bootstrap](/posts/65-multi-laptop-bootstrap/) |
 [Part 3: Security Audit](/posts/67-multi-laptop-security/)
@@ -130,7 +130,7 @@ a `Brewfile`, and an `.env.local` pattern for secrets. That post was
 written and published in February 2026 but never executed against the
 actual configuration.
 
-This post documents the audit that identified three concrete blockers
+We document the audit that identified three concrete blockers
 preventing multi-laptop deployment, and the migration procedure that
 resolves them. It extends post 24's design with five additions: launchd
 plist parameterisation, a pipx tool manifest, a vim plugin-manager
@@ -180,12 +180,12 @@ visible, soft natural light. Placeholder.
 A dotfiles repository is a version-controlled directory that stores
 shell configuration files, editor settings, and system scripts in a
 form that can be deployed to any new machine with a single command.
-Think of it as the source code for your development environment: just
+Think of it as the source code for a development environment: just
 as application code can be cloned and built on a fresh server, a
 dotfiles repository can be cloned and installed on a fresh laptop.
 
 The concrete benefit is reproducibility. Without a dotfiles
-repository, two machines diverge the moment you customise one of
+repository, two machines diverge the moment one customises either of
 them. With one, the command `git clone git@github.com:rgt47/dotfiles
 ~/dotfiles && cd ~/dotfiles && ./install.sh` brings a new laptop to
 the same state as the primary machine, minus secrets that must be
@@ -209,10 +209,10 @@ This post assumes:
 - **Time required:** 3-4 hours for the initial migration; 30 minutes
   to bootstrap subsequent laptops
 
-If you are starting from scratch rather than migrating, post 24's
+For those starting from scratch rather than migrating, post 24's
 step-by-step walkthrough is the right entry point. This post assumes
-you have already completed post 64's Dropbox migration and your shell
-configuration files now live in `~` as plain, unversioned dotfiles.
+post 64's Dropbox migration is complete and that shell configuration
+files now live in `~` as plain, unversioned dotfiles.
 
 # Audit Findings: Three Blockers
 
@@ -604,9 +604,9 @@ messages descriptive enough to understand what changed and why.
    same failure mode as the `tn` incident (2026-05-03).
 
 3. **The launchd `__USER__` substitution writes to
-   `~/Library/LaunchAgents/`, not back to the repo.** If you edit a
-   plist in `~/dotfiles/launchd/` and re-run `install.sh`, the
-   substituted file is overwritten in place. Never `git add` the
+   `~/Library/LaunchAgents/`, not back to the repo.** Editing a
+   plist in `~/dotfiles/launchd/` and re-running `install.sh`
+   overwrites the substituted file in place. Never `git add` the
    file from `~/Library/LaunchAgents/`; always edit the template
    in `~/dotfiles/launchd/`.
 
@@ -626,8 +626,8 @@ messages descriptive enough to understand what changed and why.
 
 6. **Test `install.sh --dry-run` on a non-primary user account before
    running it on a second laptop.** The first dry-run on a fresh
-   environment will surface hardcoded paths and assumptions invisible
-   on the primary machine. Identify and fix them before the real
+   environment surfaces hardcoded paths and assumptions invisible on
+   the primary machine. Identify and fix them before the real
    bootstrap.
 
 # Uninstall / Rollback
@@ -772,10 +772,10 @@ matching terminal sessions, muted earth tones. Placeholder.
 The gap between a correct architecture and an executed one is
 easy to accumulate and expensive to close. Post 24 described the
 right design for a portable dotfiles repository in February 2026;
-this post documents the audit that revealed why it had not been
-executed, identifies the three blockers (no version control,
-hardcoded absolute paths, and sensitive files without an inventory),
-and provides the concrete scripts and migration procedure.
+we document the audit that revealed why it had not been executed,
+identify the three blockers (no version control, hardcoded absolute
+paths, and sensitive files without an inventory), and provide the
+concrete scripts and migration procedure.
 
 The highest-leverage change is also the simplest: `git init` in a
 directory outside cloud sync, with a `.gitignore` written before
@@ -783,20 +783,17 @@ the first commit. Everything else, the `install.sh` parameterisation,
 the launchd `__USER__` substitution, the plugin-manifest strategy,
 builds on that foundation.
 
-**Main takeaways:**
-
-- Cloud sync is not version control. A dotfiles repository outside
-  any cloud-mounted path, with GitHub as the remote, is the
-  correct design.
-- Write `.gitignore` before `git init`. This is not a best practice;
-  it is a prerequisite. One sensitive commit requires a full history
-  rewrite and credential rotation.
-- `install.sh --dry-run` before every real install. The cost of
-  reviewing the plan is ten seconds; the cost of an unexpected
-  overwrite can be an afternoon.
-- Per-file symlinks in `~/bin` are more verbose than a top-level
-  symlink but are the only pattern that works across machines with
-  different directory layouts.
+In conclusion, four points merit emphasis. First, cloud sync is not
+version control: a dotfiles repository outside any cloud-mounted
+path, with GitHub as the remote, is the correct design. Second,
+`.gitignore` must be written before `git init`; this is not a best
+practice but a prerequisite, because one sensitive commit requires a
+full history rewrite and credential rotation. Third, running
+`install.sh --dry-run` before every real install costs ten seconds to
+review and can prevent an afternoon of recovery from an unexpected
+overwrite. Fourth, per-file symlinks in `~/bin` are more verbose than
+a top-level symlink but are the only pattern that works correctly
+across machines with different directory layouts.
 
 # See Also
 
@@ -880,15 +877,13 @@ make install    # deploy symlinks and packages
 - **LinkedIn:** [Ronald Glenn Thomas](https://linkedin.com/in/rgthomaslab)
 - **Email:** rgthomas47@gmail.com
 
-I would enjoy hearing from you if:
+Feedback is welcome in the following cases:
 
-- You spot a hardcoded assumption in `install.sh` that breaks on
-  your setup.
-- You have extended the launchd section to work with systemd on
-  Linux.
-- You use a different secrets mechanism (`pass`, `gopass`, or a
-  hardware token) and want to compare notes.
-- You just want to say hello and connect.
+- A hardcoded assumption in `install.sh` breaks on a particular setup.
+- The launchd section has been extended to work with systemd on Linux.
+- A different secrets mechanism (`pass`, `gopass`, or a hardware token)
+  is in use and a comparison of notes would be welcome.
+- A general connection is of interest.
 
 ---
 
